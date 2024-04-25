@@ -1,0 +1,11 @@
+version: '3'
+services:
+    db:
+        build: .
+        restart: always
+        environment:
+            MONGO_INITDB_DATABASE: "cooking"
+            MONGO_INITDB_ROOT_USERNAME: "cooking"
+            MONGO_INITDB_ROOT_PASSWORD: "cooking"
+        ports:
+            - "27018:27017"
