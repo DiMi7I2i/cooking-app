@@ -9,7 +9,7 @@ export class RecipesController {
   @Get('recipes')
   async getRecipes(): Promise<RecipeDto[]> {
     return (await this.recipesService.findAll()).map(
-      (recipe) => new RecipeDto(recipe.name),
+      (recipe) => new RecipeDto(recipe.title),
     );
   }
 }

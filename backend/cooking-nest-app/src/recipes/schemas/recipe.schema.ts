@@ -6,7 +6,7 @@ export type RecipeDocument = Recipe & Document;
 @Schema({ collection: 'recipes' })
 export class Recipe {
   @Prop()
-  name: string;
+  title: string;
 }
 
 export const RecipeSchema = SchemaFactory.createForClass(Recipe);

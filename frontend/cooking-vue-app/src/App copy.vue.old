@@ -1,15 +1,15 @@
 <template>
-  <img alt="Vue logo" src="./assets/cooking-icon.png">
-  <RecipesList msg="Cooking App"/>
+  <img alt="Vue logo" src="./assets/logo.png">
+  <HelloWorld msg="Welcome to Your Vue.js App"/>
 </template>
 
 <script>
-import RecipesList from './components/RecipesList.vue'
+import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
   components: {
-    RecipesList
+    HelloWorld
   }
 }
 </script>
