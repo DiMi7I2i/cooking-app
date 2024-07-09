@@ -1,26 +1,24 @@
-<template>
-  <img alt="Vue logo" src="./assets/cooking-icon.png">
-  <RecipesList msg="Cooking App"/>
-</template>
-
-<script>
-import RecipesList from './components/RecipesList.vue'
-
-export default {
-  name: 'App',
-  components: {
-    RecipesList
-  }
-}
+<script setup lang="ts">
+import Header from './components/Header.vue';
+import Footer from './components/Footer.vue';
 </script>
 
-<style>
+<template>
+  <Header />
+  <router-view></router-view>
+  <Footer />
+</template>
+
+<style lang="scss">
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto 1fr;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
 }
 </style>
