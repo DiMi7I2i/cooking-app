@@ -38,16 +38,22 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
+// @ts-expect-error - ProductService is a JS module without type declarations
 import { ProductService } from '@/service/ProductService';
 
+interface Product {
+    inventoryStatus: string;
+    [key: string]: unknown;
+}
+
 onMounted(() => {
-    ProductService.getProductsSmall().then((data) => (products.value = data.slice(0, 5)));
+    ProductService.getProductsSmall().then((data: Product[]) => (products.value = data.slice(0, 5)));
 });
 
-const products = ref();
-const getSeverity = (product) => {
+const products = ref<Product[]>();
+const getSeverity = (product: Product) => {
     switch (product.inventoryStatus) {
         case 'INSTOCK':
             return 'success';
@@ -59,7 +65,7 @@ const getSeverity = (product) => {
             return 'danger';
 
         default:
-            return null;
+            return undefined;
     }
 };
 </script>

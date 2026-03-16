@@ -1,4 +1,4 @@
-enum Cost {
+export enum Cost {
     CHEAP,
     MIDDLE,
     EXPENSIVE

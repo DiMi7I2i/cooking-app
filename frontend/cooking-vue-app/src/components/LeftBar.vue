@@ -5,7 +5,7 @@ const visible = ref(false);
 </script>
 
 <template>
-        <Sidebar v-model:visible="visible">
+        <Drawer v-model:visible="visible">
             <template #container="{ closeCallback }">
                 <div class="flex flex-col h-full">
                     <div class="flex items-center justify-between px-4 pt-4 shrink-0">
@@ -126,7 +126,7 @@ const visible = ref(false);
                     </div>
                 </div>
             </template>
-        </Sidebar>
+        </Drawer>
         <Button @click="visible = true">
             <i class="pi pi-bars mt-2 sidebar-button"></i>
         </Button>

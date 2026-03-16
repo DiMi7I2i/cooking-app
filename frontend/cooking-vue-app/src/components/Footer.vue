@@ -4,14 +4,8 @@
     </footer>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            footerText: 'Copyright 2024'
-        }
-    }
-}
+<script setup lang="ts">
+const footerText = 'Copyright 2024';
 </script>
 
 <style lang="scss">

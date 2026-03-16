@@ -1,6 +1,32 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@source "../index.html";
+
+@theme {
+    --color-primary-50: rgb(236 253 245);
+    --color-primary-100: rgb(209 250 229);
+    --color-primary-200: rgb(167 243 208);
+    --color-primary-300: rgb(110 231 183);
+    --color-primary-400: rgb(52 211 153);
+    --color-primary-500: rgb(16 185 129);
+    --color-primary-600: rgb(5 150 105);
+    --color-primary-700: rgb(4 120 87);
+    --color-primary-800: rgb(6 95 70);
+    --color-primary-900: rgb(4 78 56);
+    --color-primary-950: rgb(2 44 34);
+    --color-surface-0: rgb(255 255 255);
+    --color-surface-50: rgb(249 250 251);
+    --color-surface-100: rgb(243 244 246);
+    --color-surface-200: rgb(229 231 235);
+    --color-surface-300: rgb(209 213 219);
+    --color-surface-400: rgb(156 163 175);
+    --color-surface-500: rgb(107 114 128);
+    --color-surface-600: rgb(75 85 99);
+    --color-surface-700: rgb(55 65 81);
+    --color-surface-800: rgb(31 41 55);
+    --color-surface-900: rgb(17 24 39);
+    --color-surface-950: rgb(8 8 8);
+}
 
 :root {
     font-family: 'Inter var', sans-serif;
