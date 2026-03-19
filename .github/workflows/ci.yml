@@ -24,6 +24,13 @@ jobs:
           npm cache clean --force
           npm install
 
+      - name: Upload npm debug log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-debug-log-backend
+          path: /home/runner/.npm/_logs/
+
       - name: Build
         working-directory: backend/cooking-nest-app
         run: npx nest build
