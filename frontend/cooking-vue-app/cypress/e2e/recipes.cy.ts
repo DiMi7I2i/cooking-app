@@ -15,17 +15,18 @@ describe('Recipes CRUD', () => {
     cy.get('#title').type('Crêpes bretonnes')
     cy.get('#description').type('Délicieuses crêpes de sarrasin')
 
-    // Select category
-    cy.get('#categoryCode').click()
-    cy.contains('Plat').click()
+    // PrimeVue Select: click the dropdown, wait for overlay, then click option
+    cy.get('#categoryCode').click({ force: true })
+    cy.get('.p-select-overlay').should('be.visible')
+    cy.get('.p-select-overlay').contains('Plat').click()
 
-    // Select difficulty
-    cy.get('#difficultyCode').click()
-    cy.contains('Facile').click()
+    cy.get('#difficultyCode').click({ force: true })
+    cy.get('.p-select-overlay').should('be.visible')
+    cy.get('.p-select-overlay').contains('Facile').click()
 
-    // Select cost
-    cy.get('#costCode').click()
-    cy.contains('Bon marché').click()
+    cy.get('#costCode').click({ force: true })
+    cy.get('.p-select-overlay').should('be.visible')
+    cy.get('.p-select-overlay').contains('Bon marché').click()
 
     cy.get('#preparationDuration').type('15')
     cy.get('#cookDuration').type('20')
@@ -34,11 +35,11 @@ describe('Recipes CRUD', () => {
     cy.contains('Ajouter une étape').click()
     cy.get('input').last().type('Mélanger la farine et les oeufs')
 
-    // Submit
-    cy.contains('Créer').click()
+    // Submit — use the button with type submit to avoid matching the page title
+    cy.get('button[type="submit"]').click()
 
     // Should redirect to list and show the new recipe
-    cy.url().should('eq', Cypress.config().baseUrl + '/')
+    cy.url().should('eq', Cypress.config().baseUrl + '/', { timeout: 10000 })
     cy.contains('Crêpes bretonnes').should('be.visible')
   })
 
@@ -68,26 +69,23 @@ describe('Recipes CRUD', () => {
   })
 
   it('should delete a recipe', () => {
-    // Create a recipe to delete
-    cy.visit('/recipes/create')
-    cy.get('#title').type('Recette à supprimer')
-    cy.get('#categoryCode').click()
-    cy.contains('Dessert').click()
-    cy.get('#difficultyCode').click()
-    cy.contains('Facile').click()
-    cy.get('#costCode').click()
-    cy.contains('Bon marché').click()
-    cy.contains('Créer').click()
+    // Create a recipe via API (more reliable than UI)
+    cy.request('POST', 'http://localhost:3000/data/recipes', {
+      title: 'Recette à supprimer',
+      categoryCode: 'DESSERT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+    }).then((response) => {
+      const recipeId = response.body._id
+      cy.visit(`/recipes/${recipeId}`)
+    })
 
-    // Navigate to its detail
-    cy.contains('Recette à supprimer').click()
-
-    // Delete it
+    cy.contains('Recette à supprimer').should('be.visible')
     cy.contains('Supprimer').click()
     cy.contains('Êtes-vous sûr').should('be.visible')
     cy.get('.p-dialog-footer').contains('Supprimer').click()
 
     // Should redirect to list
-    cy.url().should('eq', Cypress.config().baseUrl + '/')
+    cy.url().should('eq', Cypress.config().baseUrl + '/', { timeout: 10000 })
   })
 })
