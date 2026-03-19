@@ -16,7 +16,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: backend/cooking-nest-app/package-lock.json
 
@@ -26,7 +26,7 @@ jobs:
 
       - name: Build
         working-directory: backend/cooking-nest-app
-        run: npm run build
+        run: npx nest build
 
       - name: Unit tests
         working-directory: backend/cooking-nest-app
@@ -45,7 +45,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: frontend/cooking-vue-app/package-lock.json
 
@@ -79,7 +79,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: |
             backend/cooking-nest-app/package-lock.json
@@ -95,7 +95,7 @@ jobs:
 
       - name: Build backend
         working-directory: backend/cooking-nest-app
-        run: npm run build
+        run: npx nest build
 
       - name: Start backend
         working-directory: backend/cooking-nest-app
