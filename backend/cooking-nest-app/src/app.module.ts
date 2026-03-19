@@ -6,9 +6,12 @@ import { RecipesModule } from './recipes/recipes.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://cooking:cooking@localhost:27018', {
-      dbName: 'cooking',
-    }),
+    MongooseModule.forRoot(
+      process.env.MONGODB_URI || 'mongodb://cooking:cooking@localhost:27018',
+      {
+        dbName: process.env.MONGODB_DBNAME || 'cooking',
+      },
+    ),
     RecipesModule,
   ],
   controllers: [AppController],

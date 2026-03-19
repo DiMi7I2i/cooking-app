@@ -1,9 +1,6 @@
 describe('Recipes CRUD', () => {
-  beforeEach(() => {
-    cy.visit('/')
-  })
-
   it('should display the recipe list page', () => {
+    cy.visit('/')
     cy.contains('Rechercher').should('be.visible')
   })
 
@@ -46,19 +43,32 @@ describe('Recipes CRUD', () => {
   })
 
   it('should search recipes by title', () => {
+    // Create a recipe first so we have data to search
+    cy.request('POST', 'http://localhost:3000/data/recipes', {
+      title: 'Pad Thaï',
+      description: 'Plat thaïlandais',
+      categoryCode: 'PLAT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+      steps: ['Étape 1'],
+    })
+
+    cy.visit('/')
     cy.get('input[placeholder*="Rechercher"]').type('Pad')
     cy.contains('Rechercher').click()
     cy.contains('Pad Thaï').should('be.visible')
   })
 
   it('should view recipe detail', () => {
-    cy.contains('Pad Thaï').click()
-    cy.contains('Pad Thaï').should('be.visible')
+    cy.visit('/')
+    // Click on first visible recipe
+    cy.get('.border').first().click()
     cy.contains('Étapes').should('be.visible')
+    cy.contains('Modifier').should('be.visible')
   })
 
   it('should delete a recipe', () => {
-    // First create a recipe to delete
+    // Create a recipe to delete
     cy.visit('/recipes/create')
     cy.get('#title').type('Recette à supprimer')
     cy.get('#categoryCode').click()
