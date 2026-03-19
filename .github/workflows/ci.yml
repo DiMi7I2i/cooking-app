@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend/cooking-nest-app
-        run: npm ci
+        run: npm install
 
       - name: Build
         working-directory: backend/cooking-nest-app
@@ -51,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend/cooking-vue-app
-        run: npm ci
+        run: npm install
 
       - name: Build
         working-directory: frontend/cooking-vue-app
@@ -87,11 +87,11 @@ jobs:
 
       - name: Install backend dependencies
         working-directory: backend/cooking-nest-app
-        run: npm ci
+        run: npm install
 
       - name: Install frontend dependencies
         working-directory: frontend/cooking-vue-app
-        run: npm ci
+        run: npm install
 
       - name: Build backend
         working-directory: backend/cooking-nest-app
