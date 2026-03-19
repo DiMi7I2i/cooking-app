@@ -1,0 +1,8 @@
+export enum Category {
+  APERITIF = 'APERITIF',
+  ENTREE = 'ENTREE',
+  PLAT = 'PLAT',
+  DESSERT = 'DESSERT',
+  BOISSON = 'BOISSON',
+  DEJ_BRUNCH = 'DEJ_BRUNCH',
+}
