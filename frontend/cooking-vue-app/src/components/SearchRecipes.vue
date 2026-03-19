@@ -1,72 +1,117 @@
 <template>
-    <div class="card">
-        <DataView :value="products" paginator :rows="5">
-            <template #list="slotProps">
-                <div class="grid grid-nogutter">
-                    <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
-                        <div class="flex flex-col sm:flex-row sm:items-center p-4 gap-3" :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
-                            <div class="md:w-[10rem] relative">
-                                <img class="block xl:block mx-auto rounded-md w-full" :src="`https://primefaces.org/cdn/primevue/images/product/${item.image}`" :alt="item.name" />
-                                <Tag :value="item.inventoryStatus" :severity="getSeverity(item)" class="absolute" style="left: 4px; top: 4px"></Tag>
-                            </div>
-                            <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-4">
-                                <div class="flex flex-row md:flex-col justify-between items-start gap-2">
-                                    <div>
-                                        <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
-                                        <div class="text-lg font-medium text-surface-700 dark:text-surface-0/80 mt-2">{{ item.name }}</div>
-                                    </div>
-                                    <div class="bg-surface-100 dark:bg-surface-700 p-1" style="border-radius: 30px">
-                                        <div class="bg-surface-0 dark:bg-surface-900 flex items-center gap-2 justify-center py-1 px-2" style="border-radius: 30px; shadow-md: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)">
-                                            <span class="text-surface-700 dark:text-surface-0/80 font-medium text-sm">{{ item.rating }}</span>
-                                            <i class="pi pi-star-fill text-yellow-500"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col md:items-end gap-5">
-                                    <span class="text-xl font-semibold text-surface-700 dark:text-surface-0/80">${{ item.price }}</span>
-                                    <div class="flex flex-row-reverse md:flex-row gap-2">
-                                        <Button icon="pi pi-heart" outlined></Button>
-                                        <Button icon="pi pi-shopping-cart" label="Buy Now" :disabled="item.inventoryStatus === 'OUTOFSTOCK'" class="flex-auto md:flex-initial white-space-nowrap"></Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        </DataView>
+  <div class="p-4 max-w-6xl mx-auto">
+    <!-- Search bar -->
+    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+      <div class="flex-1">
+        <InputText
+          v-model="searchTitle"
+          placeholder="Rechercher une recette..."
+          class="w-full"
+          @keyup.enter="search"
+        />
+      </div>
+      <Select
+        v-model="searchCategory"
+        :options="categoryOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Toutes les catégories"
+        class="w-full sm:w-60"
+        showClear
+      />
+      <Button label="Rechercher" icon="pi pi-search" @click="search" />
     </div>
+
+    <!-- Loading -->
+    <div v-if="loading" class="flex justify-center p-8">
+      <ProgressSpinner />
+    </div>
+
+    <!-- Results -->
+    <div v-else-if="recipes.length > 0">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <RecipeCard v-for="recipe in recipes" :key="recipe._id" :recipe="recipe" />
+      </div>
+      <Paginator
+        v-if="total > limit"
+        :rows="limit"
+        :totalRecords="total"
+        :first="(page - 1) * limit"
+        @page="onPageChange"
+        class="mt-6"
+      />
+    </div>
+
+    <!-- Empty state -->
+    <div v-else class="text-center p-8 text-surface-500">
+      <i class="pi pi-search text-4xl mb-4 block"></i>
+      <p>Aucune recette trouvée.</p>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-// @ts-expect-error - ProductService is a JS module without type declarations
-import { ProductService } from '@/service/ProductService';
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+import type { Recipe } from '@/types/recipe'
+import { RecipeService } from '@/services/RecipeService'
+import { CategoryLabels } from '@/enums/category'
+import RecipeCard from './RecipeCard.vue'
 
-interface Product {
-    inventoryStatus: string;
-    [key: string]: unknown;
+const route = useRoute()
+const toast = useToast()
+
+const recipes = ref<Recipe[]>([])
+const loading = ref(false)
+const searchTitle = ref('')
+const searchCategory = ref<string | null>(null)
+const page = ref(1)
+const limit = ref(9)
+const total = ref(0)
+
+const categoryOptions = Object.entries(CategoryLabels).map(([value, label]) => ({
+  value,
+  label,
+}))
+
+async function fetchRecipes() {
+  loading.value = true
+  try {
+    const result = await RecipeService.getRecipes({
+      title: searchTitle.value || undefined,
+      categoryCode: searchCategory.value || undefined,
+      page: page.value,
+      limit: limit.value,
+    })
+    recipes.value = result.data
+    total.value = result.total
+  } catch (e) {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: 'Impossible de charger les recettes',
+      life: 3000,
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+function search() {
+  page.value = 1
+  fetchRecipes()
+}
+
+function onPageChange(event: { page: number }) {
+  page.value = event.page + 1
+  fetchRecipes()
 }
 
 onMounted(() => {
-    ProductService.getProductsSmall().then((data: Product[]) => (products.value = data.slice(0, 5)));
-});
-
-const products = ref<Product[]>();
-const getSeverity = (product: Product) => {
-    switch (product.inventoryStatus) {
-        case 'INSTOCK':
-            return 'success';
-
-        case 'LOWSTOCK':
-            return 'warn';
-
-        case 'OUTOFSTOCK':
-            return 'danger';
-
-        default:
-            return undefined;
-    }
-};
+  if (route.query.categoryCode) {
+    searchCategory.value = route.query.categoryCode as string
+  }
+  fetchRecipes()
+})
 </script>
-

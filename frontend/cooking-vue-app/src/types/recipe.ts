@@ -1,0 +1,29 @@
+export interface Recipe {
+  _id: string
+  title: string
+  description?: string
+  thumbnail?: string
+  categoryCode: string
+  difficultyCode: string
+  costCode: string
+  preparationDuration?: number
+  cookDuration?: number
+  breakDuration?: number
+  steps: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  total: number
+  page: number
+  limit: number
+}
+
+export interface RecipeFilters {
+  title?: string
+  categoryCode?: string
+  page?: number
+  limit?: number
+}
