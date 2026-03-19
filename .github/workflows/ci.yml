@@ -17,12 +17,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: backend/cooking-nest-app/package-lock.json
 
       - name: Install dependencies
         working-directory: backend/cooking-nest-app
-        run: npm install
+        run: |
+          npm cache clean --force
+          npm install
 
       - name: Build
         working-directory: backend/cooking-nest-app
@@ -46,12 +46,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: frontend/cooking-vue-app/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend/cooking-vue-app
-        run: npm install
+        run: |
+          npm cache clean --force
+          npm install
 
       - name: Build
         working-directory: frontend/cooking-vue-app
@@ -80,18 +80,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: |
-            backend/cooking-nest-app/package-lock.json
-            frontend/cooking-vue-app/package-lock.json
 
       - name: Install backend dependencies
         working-directory: backend/cooking-nest-app
-        run: npm install
+        run: |
+          npm cache clean --force
+          npm install
 
       - name: Install frontend dependencies
         working-directory: frontend/cooking-vue-app
-        run: npm install
+        run: |
+          npm cache clean --force
+          npm install
 
       - name: Build backend
         working-directory: backend/cooking-nest-app
