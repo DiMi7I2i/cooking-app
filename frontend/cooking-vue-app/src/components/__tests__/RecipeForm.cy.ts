@@ -1,3 +1,4 @@
+// @ts-nocheck — Cypress mount types are incompatible with Vue 3.5 defineComponent
 import RecipeForm from '../RecipeForm.vue'
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
