@@ -1,27 +1,5 @@
 <template>
   <div class="p-4 max-w-6xl mx-auto">
-    <!-- Search bar -->
-    <div class="flex flex-col sm:flex-row gap-3 mb-6">
-      <div class="flex-1">
-        <InputText
-          v-model="searchTitle"
-          placeholder="Rechercher une recette..."
-          class="w-full"
-          @keyup.enter="search"
-        />
-      </div>
-      <Select
-        v-model="searchCategory"
-        :options="categoryOptions"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Toutes les catégories"
-        class="w-full sm:w-60"
-        showClear
-      />
-      <Button label="Rechercher" icon="pi pi-search" @click="search" />
-    </div>
-
     <!-- Loading -->
     <div v-if="loading" class="flex justify-center p-8">
       <ProgressSpinner />
@@ -29,6 +7,11 @@
 
     <!-- Results -->
     <div v-else-if="recipes.length > 0">
+      <!-- Results count -->
+      <div class="mb-4 text-surface-600">
+        <span v-if="searchTitle">Résultats pour « <strong>{{ searchTitle }}</strong> » — </span>
+        <strong>{{ total }}</strong> recette{{ total > 1 ? 's' : '' }} trouvée{{ total > 1 ? 's' : '' }}
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <RecipeCard v-for="recipe in recipes" :key="recipe._id" :recipe="recipe" />
       </div>
@@ -51,12 +34,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import type { Recipe } from '@/types/recipe'
 import { RecipeService } from '@/services/RecipeService'
-import { CategoryLabels } from '@/enums/category'
 import RecipeCard from './RecipeCard.vue'
 
 const route = useRoute()
@@ -69,11 +51,6 @@ const searchCategory = ref<string | null>(null)
 const page = ref(1)
 const limit = ref(9)
 const total = ref(0)
-
-const categoryOptions = Object.entries(CategoryLabels).map(([value, label]) => ({
-  value,
-  label,
-}))
 
 async function fetchRecipes() {
   loading.value = true
@@ -108,7 +85,21 @@ function onPageChange(event: { page: number }) {
   fetchRecipes()
 }
 
+// React to URL query changes (search from Header)
+watch(
+  () => route.query,
+  (query) => {
+    searchTitle.value = (query.title as string) || ''
+    if (query.categoryCode) {
+      searchCategory.value = query.categoryCode as string
+    }
+    page.value = 1
+    fetchRecipes()
+  },
+)
+
 onMounted(() => {
+  searchTitle.value = (route.query.title as string) || ''
   if (route.query.categoryCode) {
     searchCategory.value = route.query.categoryCode as string
   }

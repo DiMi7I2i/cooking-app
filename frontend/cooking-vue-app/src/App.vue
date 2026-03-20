@@ -14,11 +14,9 @@ import Footer from './components/Footer.vue'
 #app {
   display: grid;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr auto;
-  max-width: 100%;
-  max-height: 100%;
   padding: 0;
 }
 </style>

@@ -174,16 +174,21 @@ const visible = ref(false)
       </div>
     </template>
   </Drawer>
-  <Button @click="visible = true">
-    <i class="pi pi-bars mt-2 sidebar-button"></i>
+  <Button @click="visible = true" class="burger-button" text>
+    <i class="pi pi-bars burger-icon"></i>
   </Button>
 </template>
 
 <style lang="scss">
-.sidebar-button {
-  color: white;
-  font-size: 1.5rem;
-  padding-right: 10px;
-  margin-left: 5px;
+.burger-button {
+  background: transparent !important;
+  border: none !important;
+  padding: 8px !important;
+  box-shadow: none !important;
+}
+
+.burger-icon {
+  color: white !important;
+  font-size: 2.2rem !important;
 }
 </style>

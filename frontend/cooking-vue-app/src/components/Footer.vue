@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-const footerText = 'Copyright 2024';
+const footerText = `© ${new Date().getFullYear()} Cooking App — Tous droits réservés`
 </script>
 
 <style lang="scss">
