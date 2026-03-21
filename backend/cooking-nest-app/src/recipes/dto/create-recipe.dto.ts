@@ -59,9 +59,13 @@ export class CreateRecipeDto {
   @IsOptional()
   steps?: string[];
 
-  @Transform(({ value }) =>
-    typeof value === 'string' ? JSON.parse(value) : value,
-  )
+  @Transform(({ value }) => {
+    const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+    if (Array.isArray(parsed)) {
+      return parsed.map((item: any) => Object.assign(new CreateIngredientDto(), item));
+    }
+    return parsed;
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateIngredientDto)
