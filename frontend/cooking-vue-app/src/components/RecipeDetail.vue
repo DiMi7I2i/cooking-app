@@ -45,18 +45,24 @@
       <p v-if="recipe.description" class="text-surface-600 mb-6">{{ recipe.description }}</p>
 
       <!-- Durations -->
-      <div class="flex flex-wrap gap-6 mb-6 text-surface-600">
-        <div v-if="recipe.preparationDuration" class="flex items-center gap-2">
-          <i class="pi pi-clock"></i>
-          <span>Préparation : {{ recipe.preparationDuration }} min</span>
+      <div v-if="totalDuration" class="mb-6 bg-surface-100 rounded-lg p-4">
+        <div class="text-center mb-3">
+          <i class="pi pi-hourglass mr-2"></i>
+          <span class="text-xl font-bold">{{ totalDuration }} min</span>
         </div>
-        <div v-if="recipe.cookDuration" class="flex items-center gap-2">
-          <i class="pi pi-clock"></i>
-          <span>Cuisson : {{ recipe.cookDuration }} min</span>
-        </div>
-        <div v-if="recipe.breakDuration" class="flex items-center gap-2">
-          <i class="pi pi-clock"></i>
-          <span>Repos : {{ recipe.breakDuration }} min</span>
+        <div class="flex flex-wrap justify-center gap-6 text-surface-600">
+          <div v-if="recipe.preparationDuration" class="flex items-center gap-2">
+            <i class="pi pi-clock"></i>
+            <span>Préparation : {{ recipe.preparationDuration }} min</span>
+          </div>
+          <div v-if="recipe.cookDuration" class="flex items-center gap-2">
+            <i class="pi pi-clock"></i>
+            <span>Cuisson : {{ recipe.cookDuration }} min</span>
+          </div>
+          <div v-if="recipe.breakDuration" class="flex items-center gap-2">
+            <i class="pi pi-clock"></i>
+            <span>Repos : {{ recipe.breakDuration }} min</span>
+          </div>
         </div>
       </div>
 
@@ -131,6 +137,15 @@ const difficultyLabel = computed(
 const costLabel = computed(
   () => (recipe.value ? CostLabels[recipe.value.costCode as Cost] : '')
 )
+
+const totalDuration = computed(() => {
+  if (!recipe.value) return null
+  const total =
+    (recipe.value.preparationDuration || 0) +
+    (recipe.value.cookDuration || 0) +
+    (recipe.value.breakDuration || 0)
+  return total > 0 ? total : null
+})
 
 const difficultySeverity = computed(() => {
   if (!recipe.value) return undefined

@@ -30,12 +30,9 @@
           <Tag :value="difficultyLabel" :severity="difficultySeverity" />
           <Tag :value="costLabel" />
         </div>
-        <div class="flex gap-4 text-sm text-surface-500">
-          <span v-if="recipe.preparationDuration">
-            <i class="pi pi-clock mr-1"></i>Prépa {{ recipe.preparationDuration }} min
-          </span>
-          <span v-if="recipe.cookDuration">
-            <i class="pi pi-clock mr-1"></i>Cuisson {{ recipe.cookDuration }} min
+        <div v-if="totalDuration" class="flex gap-4 text-sm text-surface-500">
+          <span>
+            <i class="pi pi-clock mr-1"></i>{{ totalDuration }} min
           </span>
         </div>
       </div>
@@ -64,6 +61,14 @@ const difficultyLabel = computed(
 const costLabel = computed(
   () => CostLabels[props.recipe.costCode as Cost] || props.recipe.costCode
 )
+
+const totalDuration = computed(() => {
+  const total =
+    (props.recipe.preparationDuration || 0) +
+    (props.recipe.cookDuration || 0) +
+    (props.recipe.breakDuration || 0)
+  return total > 0 ? total : null
+})
 
 const difficultySeverity = computed(() => {
   switch (props.recipe.difficultyCode) {
