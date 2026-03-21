@@ -52,4 +52,38 @@ describe('RecipeSchema', () => {
     const errors = recipe.validateSync();
     expect(errors).toBeUndefined();
   });
+
+  it('should store recipe with ingredients', async () => {
+    const recipe = new RecipeModel({
+      title: 'Crêpes',
+      categoryCode: 'DESSERT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+      ingredients: [
+        { name: 'Farine', quantity: 250, unit: 'g' },
+        { name: 'Sel' },
+      ],
+    });
+    const errors = recipe.validateSync();
+    expect(errors).toBeUndefined();
+    const obj = recipe.toObject();
+    expect(obj.ingredients).toBeDefined();
+    expect(obj.ingredients).toHaveLength(2);
+    expect(obj.ingredients[0].name).toBe('Farine');
+  });
+
+  it('should store ingredient without quantity and unit', async () => {
+    const recipe = new RecipeModel({
+      title: 'Test',
+      categoryCode: 'PLAT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+      ingredients: [{ name: 'Sel' }],
+    });
+    const errors = recipe.validateSync();
+    expect(errors).toBeUndefined();
+    const obj = recipe.toObject();
+    expect(obj.ingredients[0].name).toBe('Sel');
+    expect(obj.ingredients[0].quantity).toBeUndefined();
+  });
 });
