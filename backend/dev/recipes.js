@@ -13,6 +13,22 @@ db.recipes.insertMany([
         preparationDuration: 30,
         cookDuration: 15,
         breakDuration: null,
+        ingredients: [
+            { name: "Nouilles de riz", quantity: 200, unit: "g" },
+            { name: "Poulet", quantity: 150, unit: "g" },
+            { name: "Œufs", quantity: 2 },
+            { name: "Huile végétale", quantity: 3, unit: "cuillères à soupe" },
+            { name: "Basilic thaï" },
+            { name: "Ail", quantity: 2, unit: "gousses" },
+            { name: "Nuoc-mâm", quantity: 2, unit: "cuillères à soupe" },
+            { name: "Sucre", quantity: 1, unit: "cuillère à soupe" },
+            { name: "Vinaigre de riz", quantity: 1, unit: "cuillère à soupe" },
+            { name: "Cacahuètes concassées", quantity: 30, unit: "g" },
+            { name: "Piment", quantity: 1 },
+            { name: "Citron vert", quantity: 1 },
+            { name: "Sel" },
+            { name: "Paprika" }
+        ],
         steps: [
             "Faire chauffer un wok ou une grosse poêle.",
             "Ajouter 1 cuillère d'huile, ajouter le basilic, le laisser frire pendant une minute.",
