@@ -351,11 +351,13 @@ onMounted(async () => {
       form.cookDuration = recipe.cookDuration || null
       form.breakDuration = recipe.breakDuration || null
       form.steps = recipe.steps || []
-      form.ingredients = (recipe.ingredients || []).map((i) => ({
-        name: i.name,
-        quantity: i.quantity || null,
-        unit: i.unit || '',
-      }))
+      form.ingredients = (recipe.ingredients || [])
+        .filter((i) => i != null)
+        .map((i) => ({
+          name: i.name,
+          quantity: i.quantity || null,
+          unit: i.unit || '',
+        }))
       if (recipe.thumbnail) {
         imagePreview.value = `http://localhost:3000${recipe.thumbnail}`
       }

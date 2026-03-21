@@ -65,7 +65,7 @@
         <h2 class="text-xl font-semibold mb-4">Ingrédients</h2>
         <ul class="list-disc list-inside space-y-2">
           <li
-            v-for="(ingredient, index) in recipe.ingredients"
+            v-for="(ingredient, index) in recipe.ingredients.filter(i => i != null)"
             :key="index"
             class="text-surface-700"
           >
