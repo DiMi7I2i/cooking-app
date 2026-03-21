@@ -1,7 +1,7 @@
 describe('Recipes CRUD', () => {
   it('should display the recipe list page', () => {
     cy.visit('/')
-    cy.contains('Rechercher').should('be.visible')
+    cy.get('input[placeholder*="Rechercher"]').should('be.visible')
   })
 
   it('should navigate to create recipe form', () => {
@@ -63,7 +63,7 @@ describe('Recipes CRUD', () => {
 
     cy.visit('/')
     cy.get('input[placeholder*="Rechercher"]').type('Pad')
-    cy.contains('Rechercher').click()
+    cy.get('.search-button').click()
     cy.contains('Pad Thaï').should('be.visible')
   })
 
