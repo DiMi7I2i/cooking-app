@@ -29,6 +29,7 @@
           <Tag :value="categoryLabel" severity="info" />
           <Tag :value="difficultyLabel" :severity="difficultySeverity" />
           <Tag :value="costLabel" />
+          <Tag v-for="tag in tagLabels" :key="tag" :value="tag" severity="success" />
         </div>
         <div class="flex gap-4 text-sm text-surface-500">
           <span v-if="totalDuration">
@@ -49,6 +50,7 @@ import type { Recipe } from '@/types/recipe'
 import { CategoryLabels, Category } from '@/enums/category'
 import { DifficultyLabels, Difficulty } from '@/enums/difficulty'
 import { CostLabels, Cost } from '@/enums/cost'
+import { TagLabels, Tag as TagEnum } from '@/enums/tag'
 
 const props = defineProps<{
   recipe: Recipe
@@ -63,6 +65,10 @@ const difficultyLabel = computed(
 )
 const costLabel = computed(
   () => CostLabels[props.recipe.costCode as Cost] || props.recipe.costCode
+)
+
+const tagLabels = computed(() =>
+  (props.recipe.tags || []).map((t) => TagLabels[t as TagEnum] || t)
 )
 
 const totalDuration = computed(() => {

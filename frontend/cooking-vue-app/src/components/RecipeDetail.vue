@@ -13,6 +13,7 @@
             <Tag :value="categoryLabel" severity="info" />
             <Tag :value="difficultyLabel" :severity="difficultySeverity" />
             <Tag :value="costLabel" />
+            <Tag v-for="tag in tagLabels" :key="tag" :value="tag" severity="success" />
           </div>
         </div>
         <div class="flex gap-2">
@@ -128,6 +129,7 @@ import { RecipeService } from '@/services/RecipeService'
 import { CategoryLabels, Category } from '@/enums/category'
 import { DifficultyLabels, Difficulty } from '@/enums/difficulty'
 import { CostLabels, Cost } from '@/enums/cost'
+import { TagLabels, Tag as TagEnum } from '@/enums/tag'
 
 const route = useRoute()
 const router = useRouter()
@@ -145,6 +147,10 @@ const difficultyLabel = computed(
 )
 const costLabel = computed(
   () => (recipe.value ? CostLabels[recipe.value.costCode as Cost] : '')
+)
+
+const tagLabels = computed(() =>
+  recipe.value ? (recipe.value.tags || []).map((t) => TagLabels[t as TagEnum] || t) : []
 )
 
 const selectedServings = ref(1)

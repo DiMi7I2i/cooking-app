@@ -84,6 +84,13 @@ describe('RecipesService', () => {
       );
     });
 
+    it('should apply tags filter', async () => {
+      await service.findAll({ page: 1, limit: 10, tags: 'VEGAN' });
+      expect(model.find).toHaveBeenCalledWith(
+        expect.objectContaining({ tags: 'VEGAN' }),
+      );
+    });
+
     it('should use skip and limit for pagination', async () => {
       await service.findAll({ page: 2, limit: 5 });
       expect(mockQuery.skip).toHaveBeenCalledWith(5);

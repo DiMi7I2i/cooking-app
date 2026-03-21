@@ -50,6 +50,7 @@ const searchTitle = ref('')
 const searchCategory = ref<string | null>(null)
 const searchDifficulty = ref<string | null>(null)
 const searchCost = ref<string | null>(null)
+const searchTags = ref<string | null>(null)
 const page = ref(1)
 const limit = ref(9)
 const total = ref(0)
@@ -62,6 +63,7 @@ async function fetchRecipes() {
       categoryCode: searchCategory.value || undefined,
       difficultyCode: searchDifficulty.value || undefined,
       costCode: searchCost.value || undefined,
+      tags: searchTags.value || undefined,
       page: page.value,
       limit: limit.value,
     })
@@ -97,6 +99,7 @@ watch(
     searchCategory.value = (query.categoryCode as string) || null
     searchDifficulty.value = (query.difficultyCode as string) || null
     searchCost.value = (query.costCode as string) || null
+    searchTags.value = (query.tags as string) || null
     page.value = 1
     fetchRecipes()
   },
@@ -107,6 +110,7 @@ onMounted(() => {
   searchCategory.value = (route.query.categoryCode as string) || null
   searchDifficulty.value = (route.query.difficultyCode as string) || null
   searchCost.value = (route.query.costCode as string) || null
+  searchTags.value = (route.query.tags as string) || null
   fetchRecipes()
 })
 </script>

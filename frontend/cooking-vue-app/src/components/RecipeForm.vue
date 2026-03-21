@@ -65,6 +65,22 @@
         </div>
       </div>
 
+      <!-- Tags -->
+      <div class="flex flex-col gap-1">
+        <label class="font-medium">Tags</label>
+        <div class="flex flex-wrap gap-3">
+          <label v-for="option in tagOptions" :key="option.value" class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              :value="option.value"
+              v-model="form.tags"
+              class="accent-[#3eb9a1]"
+            />
+            <span>{{ option.label }}</span>
+          </label>
+        </div>
+      </div>
+
       <!-- Servings -->
       <div class="flex flex-col gap-1">
         <label for="servings" class="font-medium">Nombre de personnes *</label>
@@ -198,6 +214,7 @@ import { RecipeService } from '@/services/RecipeService'
 import { CategoryLabels } from '@/enums/category'
 import { DifficultyLabels } from '@/enums/difficulty'
 import { CostLabels } from '@/enums/cost'
+import { TagLabels } from '@/enums/tag'
 
 const route = useRoute()
 const router = useRouter()
@@ -214,6 +231,7 @@ const form = reactive({
   categoryCode: '',
   difficultyCode: '',
   costCode: '',
+  tags: [] as string[],
   servings: null as number | null,
   preparationDuration: null as number | null,
   cookDuration: null as number | null,
@@ -240,6 +258,7 @@ const difficultyOptions = Object.entries(DifficultyLabels).map(([value, label]) 
   label,
 }))
 const costOptions = Object.entries(CostLabels).map(([value, label]) => ({ value, label }))
+const tagOptions = Object.entries(TagLabels).map(([value, label]) => ({ value, label }))
 
 function addIngredient() {
   form.ingredients.push({ name: '', quantity: null, unit: '' })
@@ -314,6 +333,7 @@ async function handleSubmit() {
     formData.append('categoryCode', form.categoryCode)
     formData.append('difficultyCode', form.difficultyCode)
     formData.append('costCode', form.costCode)
+    form.tags.forEach((tag) => formData.append('tags', tag))
     if (form.servings) formData.append('servings', String(form.servings))
     if (form.preparationDuration)
       formData.append('preparationDuration', String(form.preparationDuration))
@@ -369,6 +389,7 @@ onMounted(async () => {
       form.categoryCode = recipe.categoryCode
       form.difficultyCode = recipe.difficultyCode
       form.costCode = recipe.costCode
+      form.tags = recipe.tags || []
       form.servings = recipe.servings || null
       form.preparationDuration = recipe.preparationDuration || null
       form.cookDuration = recipe.cookDuration || null

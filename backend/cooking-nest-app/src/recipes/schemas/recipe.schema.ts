@@ -4,6 +4,7 @@ import { Category } from '../enums/category.enum';
 import { Difficulty } from '../enums/difficulty.enum';
 import { Cost } from '../enums/cost.enum';
 import { Ingredient, IngredientSchema } from './ingredient.schema';
+import { Tag } from '../enums/tag.enum';
 
 export type RecipeDocument = Recipe & Document;
 
@@ -41,6 +42,9 @@ export class Recipe {
 
   @Prop({ type: [String] })
   steps: string[];
+
+  @Prop({ type: [String], enum: Tag })
+  tags: string[];
 
   @Prop({ type: [IngredientSchema] })
   ingredients: Ingredient[];

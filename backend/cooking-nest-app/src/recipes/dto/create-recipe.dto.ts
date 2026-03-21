@@ -13,6 +13,7 @@ import {
 import { Type, Transform } from 'class-transformer';
 import { CreateIngredientDto } from './create-ingredient.dto';
 import { Category } from '../enums/category.enum';
+import { Tag } from '../enums/tag.enum';
 import { Difficulty } from '../enums/difficulty.enum';
 import { Cost } from '../enums/cost.enum';
 
@@ -57,6 +58,12 @@ export class CreateRecipeDto {
   @IsInt()
   @Min(1)
   servings: number;
+
+  @Transform(({ value }) => (typeof value === 'string' ? [value] : value))
+  @IsArray()
+  @IsEnum(Tag, { each: true })
+  @IsOptional()
+  tags?: string[];
 
   @Transform(({ value }) => (typeof value === 'string' ? [value] : value))
   @IsArray()

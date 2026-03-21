@@ -36,6 +36,10 @@ export class RecipesService {
       filter.costCode = query.costCode;
     }
 
+    if (query.tags) {
+      filter.tags = query.tags;
+    }
+
     const page = query.page || 1;
     const limit = query.limit || 10;
     const skip = (page - 1) * limit;

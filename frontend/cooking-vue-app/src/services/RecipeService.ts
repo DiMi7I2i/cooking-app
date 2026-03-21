@@ -9,6 +9,7 @@ export const RecipeService = {
     if (filters.categoryCode) params.set('categoryCode', filters.categoryCode)
     if (filters.difficultyCode) params.set('difficultyCode', filters.difficultyCode)
     if (filters.costCode) params.set('costCode', filters.costCode)
+    if (filters.tags) params.set('tags', filters.tags)
     if (filters.page) params.set('page', String(filters.page))
     if (filters.limit) params.set('limit', String(filters.limit))
 

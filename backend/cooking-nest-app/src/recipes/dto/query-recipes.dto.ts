@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import { Category } from '../enums/category.enum';
 import { Difficulty } from '../enums/difficulty.enum';
 import { Cost } from '../enums/cost.enum';
+import { Tag } from '../enums/tag.enum';
 
 export class QueryRecipesDto {
   @IsOptional()
@@ -20,6 +21,10 @@ export class QueryRecipesDto {
   @IsOptional()
   @IsEnum(Cost)
   costCode?: string;
+
+  @IsOptional()
+  @IsEnum(Tag)
+  tags?: string;
 
   @IsOptional()
   @Type(() => Number)

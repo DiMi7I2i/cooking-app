@@ -10,6 +10,7 @@ db.recipes.insertMany([
         categoryCode: "PLAT",
         difficultyCode: "EASY",
         costCode: "CHEAP",
+        tags: ["LACTOSE_FREE"],
         servings: 4,
         preparationDuration: 30,
         cookDuration: 15,

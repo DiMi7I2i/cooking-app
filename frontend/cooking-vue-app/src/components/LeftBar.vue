@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { TagLabels } from '@/enums/tag'
 
 const visible = ref(false)
 const gererOpen = ref(true)
 const categoriesOpen = ref(true)
 const difficultyOpen = ref(true)
 const costOpen = ref(true)
+const tagsOpen = ref(false)
+
+const tagEntries = Object.entries(TagLabels)
 </script>
 
 <template>
@@ -246,6 +250,32 @@ const costOpen = ref(true)
                   >
                     <i class="pi pi-chevron-circle-right mr-2"></i>
                     <span class="font-medium">Coûteux</span>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="overflow-y-auto mt-4">
+          <ul class="list-none px-4 m-0">
+            <li>
+              <div
+                v-ripple
+                @click="tagsOpen = !tagsOpen"
+                class="p-3 flex items-center justify-between text-surface-600 dark:text-surface-400 cursor-pointer rounded-md"
+              >
+                <span class="font-medium">Tags</span>
+                <i :class="tagsOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+              </div>
+              <ul v-show="tagsOpen" class="list-none p-0 m-0 overflow-hidden">
+                <li v-for="[code, label] in tagEntries" :key="code">
+                  <router-link
+                    :to="{ path: '/', query: { tags: code } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-tag mr-2"></i>
+                    <span class="font-medium">{{ label }}</span>
                   </router-link>
                 </li>
               </ul>

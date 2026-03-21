@@ -16,6 +16,7 @@ export interface Recipe {
   cookDuration?: number
   breakDuration?: number
   servings: number
+  tags?: string[]
   steps: string[]
   ingredients: Ingredient[]
   createdAt: string
@@ -34,6 +35,7 @@ export interface RecipeFilters {
   categoryCode?: string
   difficultyCode?: string
   costCode?: string
+  tags?: string
   page?: number
   limit?: number
 }

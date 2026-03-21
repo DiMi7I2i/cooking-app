@@ -77,6 +77,47 @@ describe('RecipeSchema', () => {
     expect(obj.servings).toBe(4);
   });
 
+  it('should accept recipe with tags', async () => {
+    const recipe = new RecipeModel({
+      title: 'Test',
+      categoryCode: 'PLAT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+      servings: 4,
+      tags: ['VEGAN', 'GLUTEN_FREE'],
+    });
+    const errors = recipe.validateSync();
+    expect(errors).toBeUndefined();
+    const obj = recipe.toObject();
+    expect(obj.tags).toHaveLength(2);
+    expect(obj.tags).toContain('VEGAN');
+  });
+
+  it('should accept recipe without tags', async () => {
+    const recipe = new RecipeModel({
+      title: 'Test',
+      categoryCode: 'PLAT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+      servings: 2,
+    });
+    const errors = recipe.validateSync();
+    expect(errors).toBeUndefined();
+  });
+
+  it('should reject invalid tag value', async () => {
+    const recipe = new RecipeModel({
+      title: 'Test',
+      categoryCode: 'PLAT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+      servings: 2,
+      tags: ['INVALID_TAG'],
+    });
+    const errors = recipe.validateSync();
+    expect(errors.errors['tags.0']).toBeDefined();
+  });
+
   it('should store recipe with ingredients', async () => {
     const recipe = new RecipeModel({
       title: 'Crêpes',
