@@ -10,10 +10,10 @@
         <div>
           <h1 class="text-3xl font-bold m-0">{{ recipe.title }}</h1>
           <div class="flex flex-wrap gap-2 mt-3">
-            <Tag :value="categoryLabel" severity="info" />
+            <Tag :value="categoryLabel" severity="secondary" />
             <Tag :value="difficultyLabel" :severity="difficultySeverity" />
-            <Tag :value="costLabel" />
-            <Tag v-for="tag in tagLabels" :key="tag" :value="tag" severity="success" />
+            <Tag :value="costLabel" :severity="costSeverity" />
+            <Tag v-for="tag in tagLabels" :key="tag" :value="tag" class="tag-custom" />
           </div>
         </div>
         <div class="flex gap-2">
@@ -153,6 +153,20 @@ const tagLabels = computed(() =>
   recipe.value ? (recipe.value.tags || []).map((t) => TagLabels[t as TagEnum] || t) : []
 )
 
+const costSeverity = computed(() => {
+  if (!recipe.value) return undefined
+  switch (recipe.value.costCode) {
+    case 'CHEAP':
+      return 'success'
+    case 'MIDDLE':
+      return 'warn'
+    case 'EXPENSIVE':
+      return 'danger'
+    default:
+      return undefined
+  }
+})
+
 const selectedServings = ref(1)
 
 function increaseServings() {
@@ -269,6 +283,11 @@ onMounted(fetchRecipe)
 </script>
 
 <style scoped>
+.tag-custom {
+  background-color: #3eb9a1 !important;
+  color: white !important;
+}
+
 .fraction {
   font-size: 1.3em;
 }

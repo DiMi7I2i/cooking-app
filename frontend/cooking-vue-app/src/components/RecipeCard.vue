@@ -26,10 +26,10 @@
           {{ recipe.description }}
         </p>
         <div class="flex flex-wrap gap-2 mt-auto">
-          <Tag :value="categoryLabel" severity="info" />
+          <Tag :value="categoryLabel" severity="secondary" />
           <Tag :value="difficultyLabel" :severity="difficultySeverity" />
-          <Tag :value="costLabel" />
-          <Tag v-for="tag in tagLabels" :key="tag" :value="tag" severity="success" />
+          <Tag :value="costLabel" :severity="costSeverity" />
+          <Tag v-for="tag in tagLabels" :key="tag" :value="tag" class="tag-custom" />
         </div>
         <div class="flex gap-4 text-sm text-surface-500">
           <span v-if="totalDuration">
@@ -79,6 +79,19 @@ const totalDuration = computed(() => {
   return total > 0 ? total : null
 })
 
+const costSeverity = computed(() => {
+  switch (props.recipe.costCode) {
+    case 'CHEAP':
+      return 'success'
+    case 'MIDDLE':
+      return 'warn'
+    case 'EXPENSIVE':
+      return 'danger'
+    default:
+      return undefined
+  }
+})
+
 const difficultySeverity = computed(() => {
   switch (props.recipe.difficultyCode) {
     case 'EASY':
@@ -95,3 +108,10 @@ const difficultySeverity = computed(() => {
   }
 })
 </script>
+
+<style scoped>
+.tag-custom {
+  background-color: #3eb9a1 !important;
+  color: white !important;
+}
+</style>
