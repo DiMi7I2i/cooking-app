@@ -111,6 +111,40 @@
         />
       </div>
 
+      <!-- Ingredients -->
+      <div class="flex flex-col gap-2">
+        <label class="font-medium">Ingrédients *</label>
+        <small v-if="errors.ingredients" class="text-red-500">{{ errors.ingredients }}</small>
+        <div
+          v-for="(ingredient, index) in form.ingredients"
+          :key="index"
+          class="flex gap-2 items-center"
+        >
+          <InputText
+            v-model="form.ingredients[index].name"
+            placeholder="Nom *"
+            class="flex-1"
+          />
+          <input
+            v-model.number="form.ingredients[index].quantity"
+            type="number"
+            min="0.01"
+            step="any"
+            placeholder="Qté"
+            class="p-inputtext w-24"
+          />
+          <InputText v-model="form.ingredients[index].unit" placeholder="Unité" class="w-24" />
+          <Button icon="pi pi-trash" severity="danger" text @click="removeIngredient(index)" />
+        </div>
+        <Button
+          label="Ajouter un ingrédient"
+          icon="pi pi-plus"
+          severity="secondary"
+          text
+          @click="addIngredient"
+        />
+      </div>
+
       <!-- Steps -->
       <div class="flex flex-col gap-2">
         <label class="font-medium">Étapes</label>
@@ -170,6 +204,7 @@ const form = reactive({
   cookDuration: null as number | null,
   breakDuration: null as number | null,
   steps: [] as string[],
+  ingredients: [] as { name: string; quantity: number | null; unit: string }[],
 })
 
 const errors = reactive({
@@ -177,6 +212,7 @@ const errors = reactive({
   categoryCode: '',
   difficultyCode: '',
   costCode: '',
+  ingredients: '',
 })
 
 const categoryOptions = Object.entries(CategoryLabels).map(([value, label]) => ({
@@ -188,6 +224,14 @@ const difficultyOptions = Object.entries(DifficultyLabels).map(([value, label]) 
   label,
 }))
 const costOptions = Object.entries(CostLabels).map(([value, label]) => ({ value, label }))
+
+function addIngredient() {
+  form.ingredients.push({ name: '', quantity: null, unit: '' })
+}
+
+function removeIngredient(index: number) {
+  form.ingredients.splice(index, 1)
+}
 
 function addStep() {
   form.steps.push('')
@@ -212,6 +256,7 @@ function validate(): boolean {
   errors.categoryCode = ''
   errors.difficultyCode = ''
   errors.costCode = ''
+  errors.ingredients = ''
 
   if (!form.title.trim()) {
     errors.title = 'Le titre est requis'
@@ -227,6 +272,11 @@ function validate(): boolean {
   }
   if (!form.costCode) {
     errors.costCode = 'Le coût est requis'
+    valid = false
+  }
+  const validIngredients = form.ingredients.filter((i) => i.name.trim())
+  if (validIngredients.length === 0) {
+    errors.ingredients = 'Au moins un ingrédient est requis'
     valid = false
   }
   return valid
@@ -247,6 +297,14 @@ async function handleSubmit() {
       formData.append('preparationDuration', String(form.preparationDuration))
     if (form.cookDuration) formData.append('cookDuration', String(form.cookDuration))
     if (form.breakDuration) formData.append('breakDuration', String(form.breakDuration))
+    const validIngredients = form.ingredients
+      .filter((i) => i.name.trim())
+      .map((i) => ({
+        name: i.name.trim(),
+        ...(i.quantity ? { quantity: i.quantity } : {}),
+        ...(i.unit?.trim() ? { unit: i.unit.trim() } : {}),
+      }))
+    formData.append('ingredients', JSON.stringify(validIngredients))
     form.steps.filter((s) => s.trim()).forEach((step) => formData.append('steps', step))
     if (thumbnailFile.value) formData.append('thumbnail', thumbnailFile.value)
 
@@ -293,6 +351,11 @@ onMounted(async () => {
       form.cookDuration = recipe.cookDuration || null
       form.breakDuration = recipe.breakDuration || null
       form.steps = recipe.steps || []
+      form.ingredients = (recipe.ingredients || []).map((i) => ({
+        name: i.name,
+        quantity: i.quantity || null,
+        unit: i.unit || '',
+      }))
       if (recipe.thumbnail) {
         imagePreview.value = `http://localhost:3000${recipe.thumbnail}`
       }

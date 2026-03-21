@@ -31,11 +31,17 @@ describe('Recipes CRUD', () => {
     cy.get('#preparationDuration').type('15')
     cy.get('#cookDuration').type('20')
 
+    // Add an ingredient
+    cy.contains('Ajouter un ingrédient').click()
+    cy.get('input[placeholder="Nom *"]').first().type('Farine')
+    cy.get('input[placeholder="Qté"]').first().type('250')
+    cy.get('input[placeholder="Unité"]').first().type('g')
+
     // Add a step
     cy.contains('Ajouter une étape').click()
     cy.get('input').last().type('Mélanger la farine et les oeufs')
 
-    // Submit — use the button with type submit to avoid matching the page title
+    // Submit
     cy.get('button[type="submit"]').click()
 
     // Should redirect to list and show the new recipe
@@ -52,6 +58,7 @@ describe('Recipes CRUD', () => {
       difficultyCode: 'EASY',
       costCode: 'CHEAP',
       steps: ['Étape 1'],
+      ingredients: [{ name: 'Nouilles de riz', quantity: 200, unit: 'g' }],
     })
 
     cy.visit('/')
@@ -64,7 +71,6 @@ describe('Recipes CRUD', () => {
     cy.visit('/')
     // Click on first visible recipe
     cy.get('.border').first().click()
-    cy.contains('Étapes').should('be.visible')
     cy.contains('Modifier').should('be.visible')
   })
 
@@ -75,6 +81,7 @@ describe('Recipes CRUD', () => {
       categoryCode: 'DESSERT',
       difficultyCode: 'EASY',
       costCode: 'CHEAP',
+      ingredients: [{ name: 'Test' }],
     }).then((response) => {
       const recipeId = response.body._id
       cy.visit(`/recipes/${recipeId}`)

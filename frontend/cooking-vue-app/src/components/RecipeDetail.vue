@@ -60,6 +60,28 @@
         </div>
       </div>
 
+      <!-- Ingredients -->
+      <div v-if="recipe.ingredients && recipe.ingredients.length > 0" class="mb-6">
+        <h2 class="text-xl font-semibold mb-4">Ingrédients</h2>
+        <ul class="list-disc list-inside space-y-2">
+          <li
+            v-for="(ingredient, index) in recipe.ingredients"
+            :key="index"
+            class="text-surface-700"
+          >
+            <template v-if="ingredient.quantity && ingredient.unit">
+              {{ ingredient.quantity }} {{ ingredient.unit }} — {{ ingredient.name }}
+            </template>
+            <template v-else-if="ingredient.quantity">
+              {{ ingredient.quantity }} — {{ ingredient.name }}
+            </template>
+            <template v-else>
+              {{ ingredient.name }}
+            </template>
+          </li>
+        </ul>
+      </div>
+
       <!-- Steps -->
       <div v-if="recipe.steps && recipe.steps.length > 0">
         <h2 class="text-xl font-semibold mb-4">Étapes</h2>

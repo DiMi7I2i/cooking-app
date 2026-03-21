@@ -1,3 +1,9 @@
+export interface Ingredient {
+  name: string
+  quantity?: number
+  unit?: string
+}
+
 export interface Recipe {
   _id: string
   title: string
@@ -10,6 +16,7 @@ export interface Recipe {
   cookDuration?: number
   breakDuration?: number
   steps: string[]
+  ingredients: Ingredient[]
   createdAt: string
   updatedAt: string
 }
