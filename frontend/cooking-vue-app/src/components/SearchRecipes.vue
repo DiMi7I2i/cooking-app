@@ -48,6 +48,8 @@ const recipes = ref<Recipe[]>([])
 const loading = ref(false)
 const searchTitle = ref('')
 const searchCategory = ref<string | null>(null)
+const searchDifficulty = ref<string | null>(null)
+const searchCost = ref<string | null>(null)
 const page = ref(1)
 const limit = ref(9)
 const total = ref(0)
@@ -58,6 +60,8 @@ async function fetchRecipes() {
     const result = await RecipeService.getRecipes({
       title: searchTitle.value || undefined,
       categoryCode: searchCategory.value || undefined,
+      difficultyCode: searchDifficulty.value || undefined,
+      costCode: searchCost.value || undefined,
       page: page.value,
       limit: limit.value,
     })
@@ -91,6 +95,8 @@ watch(
   (query) => {
     searchTitle.value = (query.title as string) || ''
     searchCategory.value = (query.categoryCode as string) || null
+    searchDifficulty.value = (query.difficultyCode as string) || null
+    searchCost.value = (query.costCode as string) || null
     page.value = 1
     fetchRecipes()
   },
@@ -99,6 +105,8 @@ watch(
 onMounted(() => {
   searchTitle.value = (route.query.title as string) || ''
   searchCategory.value = (route.query.categoryCode as string) || null
+  searchDifficulty.value = (route.query.difficultyCode as string) || null
+  searchCost.value = (route.query.costCode as string) || null
   fetchRecipes()
 })
 </script>

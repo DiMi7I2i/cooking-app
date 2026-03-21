@@ -31,6 +31,8 @@ export interface PaginatedResponse<T> {
 export interface RecipeFilters {
   title?: string
   categoryCode?: string
+  difficultyCode?: string
+  costCode?: string
   page?: number
   limit?: number
 }

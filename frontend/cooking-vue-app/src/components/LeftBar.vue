@@ -4,6 +4,8 @@ import { ref } from 'vue'
 const visible = ref(false)
 const gererOpen = ref(true)
 const categoriesOpen = ref(true)
+const difficultyOpen = ref(true)
+const costOpen = ref(true)
 </script>
 
 <template>
@@ -132,6 +134,118 @@ const categoriesOpen = ref(true)
                   >
                     <i class="pi pi-chevron-circle-right mr-2"></i>
                     <span class="font-medium">Petit-déj / Brunch</span>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="overflow-y-auto mt-4">
+          <ul class="list-none px-4 m-0">
+            <li>
+              <div
+                v-ripple
+                @click="difficultyOpen = !difficultyOpen"
+                class="p-3 flex items-center justify-between text-surface-600 dark:text-surface-400 cursor-pointer rounded-md"
+              >
+                <span class="font-medium">Difficulté</span>
+                <i :class="difficultyOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+              </div>
+              <ul v-show="difficultyOpen" class="list-none p-0 m-0 overflow-hidden">
+                <li>
+                  <router-link
+                    :to="{ path: '/', query: { difficultyCode: 'EASY' } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-chevron-circle-right mr-2"></i>
+                    <span class="font-medium">Facile</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="{ path: '/', query: { difficultyCode: 'MIDDLE' } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-chevron-circle-right mr-2"></i>
+                    <span class="font-medium">Moyen</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="{ path: '/', query: { difficultyCode: 'HARD' } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-chevron-circle-right mr-2"></i>
+                    <span class="font-medium">Difficile</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="{ path: '/', query: { difficultyCode: 'VERY_HARD' } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-chevron-circle-right mr-2"></i>
+                    <span class="font-medium">Très difficile</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="{ path: '/', query: { difficultyCode: 'EXPERT' } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-chevron-circle-right mr-2"></i>
+                    <span class="font-medium">Expert</span>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="overflow-y-auto mt-4">
+          <ul class="list-none px-4 m-0">
+            <li>
+              <div
+                v-ripple
+                @click="costOpen = !costOpen"
+                class="p-3 flex items-center justify-between text-surface-600 dark:text-surface-400 cursor-pointer rounded-md"
+              >
+                <span class="font-medium">Coût</span>
+                <i :class="costOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+              </div>
+              <ul v-show="costOpen" class="list-none p-0 m-0 overflow-hidden">
+                <li>
+                  <router-link
+                    :to="{ path: '/', query: { costCode: 'CHEAP' } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-chevron-circle-right mr-2"></i>
+                    <span class="font-medium">Bon marché</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="{ path: '/', query: { costCode: 'MIDDLE' } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-chevron-circle-right mr-2"></i>
+                    <span class="font-medium">Moyen</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="{ path: '/', query: { costCode: 'EXPENSIVE' } }"
+                    @click="visible = false"
+                    class="flex items-center cursor-pointer p-3 rounded-md text-surface-700 dark:text-surface-0/80 hover:bg-surface-100 dark:hover:bg-surface-700 duration-200 transition-colors no-underline"
+                  >
+                    <i class="pi pi-chevron-circle-right mr-2"></i>
+                    <span class="font-medium">Coûteux</span>
                   </router-link>
                 </li>
               </ul>

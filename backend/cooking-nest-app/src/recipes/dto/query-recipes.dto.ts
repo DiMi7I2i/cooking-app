@@ -1,6 +1,8 @@
 import { IsOptional, IsString, IsEnum, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Category } from '../enums/category.enum';
+import { Difficulty } from '../enums/difficulty.enum';
+import { Cost } from '../enums/cost.enum';
 
 export class QueryRecipesDto {
   @IsOptional()
@@ -10,6 +12,14 @@ export class QueryRecipesDto {
   @IsOptional()
   @IsEnum(Category)
   categoryCode?: string;
+
+  @IsOptional()
+  @IsEnum(Difficulty)
+  difficultyCode?: string;
+
+  @IsOptional()
+  @IsEnum(Cost)
+  costCode?: string;
 
   @IsOptional()
   @Type(() => Number)

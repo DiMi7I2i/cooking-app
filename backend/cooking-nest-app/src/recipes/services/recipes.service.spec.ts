@@ -70,6 +70,20 @@ describe('RecipesService', () => {
       );
     });
 
+    it('should apply difficultyCode filter', async () => {
+      await service.findAll({ page: 1, limit: 10, difficultyCode: 'EASY' });
+      expect(model.find).toHaveBeenCalledWith(
+        expect.objectContaining({ difficultyCode: 'EASY' }),
+      );
+    });
+
+    it('should apply costCode filter', async () => {
+      await service.findAll({ page: 1, limit: 10, costCode: 'CHEAP' });
+      expect(model.find).toHaveBeenCalledWith(
+        expect.objectContaining({ costCode: 'CHEAP' }),
+      );
+    });
+
     it('should use skip and limit for pagination', async () => {
       await service.findAll({ page: 2, limit: 5 });
       expect(mockQuery.skip).toHaveBeenCalledWith(5);
