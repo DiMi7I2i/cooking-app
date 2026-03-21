@@ -10,6 +10,7 @@ db.recipes.insertMany([
         categoryCode: "PLAT",
         difficultyCode: "EASY",
         costCode: "CHEAP",
+        servings: 4,
         preparationDuration: 30,
         cookDuration: 15,
         breakDuration: null,

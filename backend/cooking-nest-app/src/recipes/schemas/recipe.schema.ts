@@ -36,6 +36,9 @@ export class Recipe {
   @Prop()
   breakDuration: number;
 
+  @Prop({ required: true, min: 1 })
+  servings: number;
+
   @Prop({ type: [String] })
   steps: string[];
 

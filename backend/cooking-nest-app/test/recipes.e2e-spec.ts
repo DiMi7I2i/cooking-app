@@ -41,6 +41,7 @@ describe('Recipes (e2e)', () => {
         costCode: 'CHEAP',
         preparationDuration: 30,
         cookDuration: 15,
+        servings: 4,
         steps: ['Étape 1', 'Étape 2'],
         ingredients: [
           { name: 'Nouilles de riz', quantity: 200, unit: 'g' },

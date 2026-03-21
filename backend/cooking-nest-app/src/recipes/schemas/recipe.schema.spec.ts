@@ -47,10 +47,34 @@ describe('RecipeSchema', () => {
       costCode: 'CHEAP',
       preparationDuration: 30,
       cookDuration: 15,
+      servings: 4,
       steps: ['Étape 1', 'Étape 2'],
     });
     const errors = recipe.validateSync();
     expect(errors).toBeUndefined();
+  });
+
+  it('should require servings', async () => {
+    const recipe = new RecipeModel({
+      title: 'Test',
+      categoryCode: 'PLAT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+    });
+    const errors = recipe.validateSync();
+    expect(errors.errors['servings']).toBeDefined();
+  });
+
+  it('should store servings', async () => {
+    const recipe = new RecipeModel({
+      title: 'Test',
+      categoryCode: 'PLAT',
+      difficultyCode: 'EASY',
+      costCode: 'CHEAP',
+      servings: 4,
+    });
+    const obj = recipe.toObject();
+    expect(obj.servings).toBe(4);
   });
 
   it('should store recipe with ingredients', async () => {
@@ -59,6 +83,7 @@ describe('RecipeSchema', () => {
       categoryCode: 'DESSERT',
       difficultyCode: 'EASY',
       costCode: 'CHEAP',
+      servings: 4,
       ingredients: [
         { name: 'Farine', quantity: 250, unit: 'g' },
         { name: 'Sel' },
@@ -78,6 +103,7 @@ describe('RecipeSchema', () => {
       categoryCode: 'PLAT',
       difficultyCode: 'EASY',
       costCode: 'CHEAP',
+      servings: 2,
       ingredients: [{ name: 'Sel' }],
     });
     const errors = recipe.validateSync();

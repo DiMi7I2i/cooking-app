@@ -53,6 +53,11 @@ export class CreateRecipeDto {
   @IsOptional()
   breakDuration?: number;
 
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  servings: number;
+
   @Transform(({ value }) => (typeof value === 'string' ? [value] : value))
   @IsArray()
   @IsString({ each: true })

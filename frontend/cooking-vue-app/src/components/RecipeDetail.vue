@@ -68,7 +68,15 @@
 
       <!-- Ingredients -->
       <div v-if="recipe.ingredients && recipe.ingredients.length > 0" class="mb-6 mb-2">
-        <h2 class="text-xl font-semibold mb-4">Ingrédients</h2>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold m-0">Ingrédients</h2>
+          <div v-if="recipe.servings" class="flex items-center gap-2">
+            <i class="pi pi-users text-surface-500"></i>
+            <Button icon="pi pi-minus" severity="secondary" text rounded size="small" @click="decreaseServings" :disabled="selectedServings <= 1" />
+            <span class="font-bold text-lg min-w-8 text-center">{{ selectedServings }}</span>
+            <Button icon="pi pi-plus" severity="secondary" text rounded size="small" @click="increaseServings" />
+          </div>
+        </div>
         <table class="w-full">
           <tr
             v-for="(ingredient, index) in recipe.ingredients.filter(i => i != null)"
@@ -78,10 +86,10 @@
             <td class="py-2 font-medium text-surface-700">{{ ingredient.name }}</td>
             <td class="py-2 text-right text-surface-500">
               <template v-if="ingredient.quantity && ingredient.unit">
-                {{ ingredient.quantity }} {{ ingredient.unit }}
+                {{ adjustedQuantity(ingredient.quantity, true) }} {{ ingredient.unit }}
               </template>
               <template v-else-if="ingredient.quantity">
-                {{ ingredient.quantity }}
+                <span :class="{ fraction: isFraction(ingredient.quantity) }">{{ adjustedQuantity(ingredient.quantity, false) }}</span>
               </template>
             </td>
           </tr>
@@ -139,6 +147,55 @@ const costLabel = computed(
   () => (recipe.value ? CostLabels[recipe.value.costCode as Cost] : '')
 )
 
+const selectedServings = ref(1)
+
+function increaseServings() {
+  selectedServings.value++
+}
+
+function decreaseServings() {
+  if (selectedServings.value > 1) selectedServings.value--
+}
+
+function toFraction(value: number): string {
+  const fractions: [number, string][] = [
+    [0.25, '¼'],
+    [0.33, '⅓'],
+    [0.5, '½'],
+    [0.67, '⅔'],
+    [0.75, '¾'],
+  ]
+  const whole = Math.floor(value)
+  const decimal = value - whole
+
+  if (decimal < 0.01) return String(whole)
+
+  for (const [threshold, symbol] of fractions) {
+    if (Math.abs(decimal - threshold) < 0.05) {
+      return whole > 0 ? `${whole}${symbol}` : symbol
+    }
+  }
+
+  return value.toFixed(1)
+}
+
+function isFraction(originalQuantity: number): boolean {
+  if (!recipe.value?.servings) return false
+  const ratio = selectedServings.value / recipe.value.servings
+  const adjusted = originalQuantity * ratio
+  return adjusted < 1 && adjusted % 1 !== 0
+}
+
+function adjustedQuantity(originalQuantity: number, hasUnit: boolean): string {
+  if (!recipe.value?.servings) return String(originalQuantity)
+  const ratio = selectedServings.value / recipe.value.servings
+  const adjusted = originalQuantity * ratio
+
+  if (adjusted % 1 === 0) return String(adjusted)
+  if (!hasUnit && adjusted < 1) return toFraction(adjusted)
+  return adjusted.toFixed(1)
+}
+
 const totalDuration = computed(() => {
   if (!recipe.value) return null
   const total =
@@ -169,6 +226,9 @@ async function fetchRecipe() {
   loading.value = true
   try {
     recipe.value = await RecipeService.getRecipe(route.params.id as string)
+    if (recipe.value.servings) {
+      selectedServings.value = recipe.value.servings
+    }
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Erreur', detail: 'Recette non trouvée', life: 3000 })
     router.push('/')
@@ -203,6 +263,10 @@ onMounted(fetchRecipe)
 </script>
 
 <style scoped>
+.fraction {
+  font-size: 1.3em;
+}
+
 .step-number {
   width: 32px;
   height: 32px;

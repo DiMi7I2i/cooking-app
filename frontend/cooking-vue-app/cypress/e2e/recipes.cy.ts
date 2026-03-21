@@ -57,6 +57,7 @@ describe('Recipes CRUD', () => {
       categoryCode: 'PLAT',
       difficultyCode: 'EASY',
       costCode: 'CHEAP',
+      servings: 4,
       steps: ['Étape 1'],
       ingredients: [{ name: 'Nouilles de riz', quantity: 200, unit: 'g' }],
     })
@@ -81,6 +82,7 @@ describe('Recipes CRUD', () => {
       categoryCode: 'DESSERT',
       difficultyCode: 'EASY',
       costCode: 'CHEAP',
+      servings: 1,
       ingredients: [{ name: 'Test' }],
     }).then((response) => {
       const recipeId = response.body._id

@@ -30,9 +30,12 @@
           <Tag :value="difficultyLabel" :severity="difficultySeverity" />
           <Tag :value="costLabel" />
         </div>
-        <div v-if="totalDuration" class="flex gap-4 text-sm text-surface-500">
-          <span>
+        <div class="flex gap-4 text-sm text-surface-500">
+          <span v-if="totalDuration">
             <i class="pi pi-clock mr-1"></i>{{ totalDuration }} min
+          </span>
+          <span v-if="recipe.servings">
+            <i class="pi pi-users mr-1"></i>{{ recipe.servings }} pers.
           </span>
         </div>
       </div>

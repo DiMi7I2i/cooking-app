@@ -15,6 +15,7 @@ export interface Recipe {
   preparationDuration?: number
   cookDuration?: number
   breakDuration?: number
+  servings: number
   steps: string[]
   ingredients: Ingredient[]
   createdAt: string
