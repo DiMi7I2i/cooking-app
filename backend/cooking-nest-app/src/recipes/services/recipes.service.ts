@@ -37,7 +37,8 @@ export class RecipesService {
     }
 
     if (query.tags) {
-      filter.tags = query.tags;
+      const tagList = query.tags.split(',').map((t) => t.trim());
+      filter.tags = { $all: tagList };
     }
 
     const page = query.page || 1;

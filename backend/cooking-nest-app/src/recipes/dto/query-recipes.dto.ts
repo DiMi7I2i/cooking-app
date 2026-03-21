@@ -23,7 +23,7 @@ export class QueryRecipesDto {
   costCode?: string;
 
   @IsOptional()
-  @IsEnum(Tag)
+  @IsString()
   tags?: string;
 
   @IsOptional()

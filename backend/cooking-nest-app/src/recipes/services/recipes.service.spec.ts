@@ -84,10 +84,17 @@ describe('RecipesService', () => {
       );
     });
 
-    it('should apply tags filter', async () => {
+    it('should apply single tag filter', async () => {
       await service.findAll({ page: 1, limit: 10, tags: 'VEGAN' });
       expect(model.find).toHaveBeenCalledWith(
-        expect.objectContaining({ tags: 'VEGAN' }),
+        expect.objectContaining({ tags: { $all: ['VEGAN'] } }),
+      );
+    });
+
+    it('should apply multiple tags filter', async () => {
+      await service.findAll({ page: 1, limit: 10, tags: 'VEGAN,BIO' });
+      expect(model.find).toHaveBeenCalledWith(
+        expect.objectContaining({ tags: { $all: ['VEGAN', 'BIO'] } }),
       );
     });
 
