@@ -7,8 +7,11 @@ import {
   IsInt,
   Min,
   IsArray,
+  ValidateNested,
+  ArrayNotEmpty,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
+import { CreateIngredientDto } from './create-ingredient.dto';
 import { Category } from '../enums/category.enum';
 import { Difficulty } from '../enums/difficulty.enum';
 import { Cost } from '../enums/cost.enum';
@@ -55,4 +58,13 @@ export class CreateRecipeDto {
   @IsString({ each: true })
   @IsOptional()
   steps?: string[];
+
+  @Transform(({ value }) =>
+    typeof value === 'string' ? JSON.parse(value) : value,
+  )
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateIngredientDto)
+  @ArrayNotEmpty()
+  ingredients: CreateIngredientDto[];
 }

@@ -30,7 +30,7 @@ describe('Recipes (e2e)', () => {
     await mongod.stop();
   });
 
-  it('POST /data/recipes — should create a recipe', async () => {
+  it('POST /data/recipes — should create a recipe with ingredients', async () => {
     const res = await request(app.getHttpServer())
       .post('/data/recipes')
       .send({
@@ -42,11 +42,17 @@ describe('Recipes (e2e)', () => {
         preparationDuration: 30,
         cookDuration: 15,
         steps: ['Étape 1', 'Étape 2'],
+        ingredients: [
+          { name: 'Nouilles de riz', quantity: 200, unit: 'g' },
+          { name: 'Sel' },
+        ],
       })
       .expect(201);
 
     expect(res.body.title).toBe('Pad Thaï');
     expect(res.body._id).toBeDefined();
+    expect(res.body.ingredients).toHaveLength(2);
+    expect(res.body.ingredients[0].name).toBe('Nouilles de riz');
     createdRecipeId = res.body._id;
   });
 
@@ -54,6 +60,19 @@ describe('Recipes (e2e)', () => {
     await request(app.getHttpServer())
       .post('/data/recipes')
       .send({ title: '' })
+      .expect(400);
+  });
+
+  it('POST /data/recipes — should return 400 when ingredients is empty', async () => {
+    await request(app.getHttpServer())
+      .post('/data/recipes')
+      .send({
+        title: 'Test',
+        categoryCode: 'PLAT',
+        difficultyCode: 'EASY',
+        costCode: 'CHEAP',
+        ingredients: [],
+      })
       .expect(400);
   });
 
@@ -94,13 +113,18 @@ describe('Recipes (e2e)', () => {
     expect(res.body.data).toHaveLength(1);
   });
 
-  it('GET /data/recipes/:id — should return a recipe', async () => {
+  it('GET /data/recipes/:id — should return a recipe with ingredients', async () => {
     const res = await request(app.getHttpServer())
       .get(`/data/recipes/${createdRecipeId}`)
       .expect(200);
 
     expect(res.body.title).toBe('Pad Thaï');
     expect(res.body.steps).toEqual(['Étape 1', 'Étape 2']);
+    expect(res.body.ingredients).toHaveLength(2);
+    expect(res.body.ingredients[0].name).toBe('Nouilles de riz');
+    expect(res.body.ingredients[0].quantity).toBe(200);
+    expect(res.body.ingredients[0].unit).toBe('g');
+    expect(res.body.ingredients[1].name).toBe('Sel');
   });
 
   it('GET /data/recipes/:id — should return 404 for unknown id', async () => {

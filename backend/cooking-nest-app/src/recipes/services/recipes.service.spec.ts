@@ -104,6 +104,7 @@ describe('RecipesService', () => {
         categoryCode: 'DESSERT',
         difficultyCode: 'EASY',
         costCode: 'CHEAP',
+        ingredients: [{ name: 'Farine', quantity: 250, unit: 'g' }],
       };
       const createdRecipe = { _id: 'newid', ...createDto };
       model.create = jest.fn().mockResolvedValue(createdRecipe);

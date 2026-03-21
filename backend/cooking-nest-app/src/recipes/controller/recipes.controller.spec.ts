@@ -59,6 +59,7 @@ describe('RecipesController', () => {
       categoryCode: 'DESSERT',
       difficultyCode: 'EASY',
       costCode: 'CHEAP',
+      ingredients: [{ name: 'Farine', quantity: 250, unit: 'g' }],
     };
     const result = await controller.createRecipe(dto, undefined);
     expect(result.title).toBe('Pad Thaï');
