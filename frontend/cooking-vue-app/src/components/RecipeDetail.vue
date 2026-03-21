@@ -67,35 +67,36 @@
       </div>
 
       <!-- Ingredients -->
-      <div v-if="recipe.ingredients && recipe.ingredients.length > 0" class="mb-6">
+      <div v-if="recipe.ingredients && recipe.ingredients.length > 0" class="mb-6 mb-2">
         <h2 class="text-xl font-semibold mb-4">Ingrédients</h2>
-        <ul class="list-disc list-inside space-y-2">
-          <li
+        <table class="w-full">
+          <tr
             v-for="(ingredient, index) in recipe.ingredients.filter(i => i != null)"
             :key="index"
-            class="text-surface-700"
+            class="border-b border-surface-200 last:border-b-0"
           >
-            <template v-if="ingredient.quantity && ingredient.unit">
-              {{ ingredient.quantity }} {{ ingredient.unit }} — {{ ingredient.name }}
-            </template>
-            <template v-else-if="ingredient.quantity">
-              {{ ingredient.quantity }} — {{ ingredient.name }}
-            </template>
-            <template v-else>
-              {{ ingredient.name }}
-            </template>
-          </li>
-        </ul>
+            <td class="py-2 font-medium text-surface-700">{{ ingredient.name }}</td>
+            <td class="py-2 text-right text-surface-500">
+              <template v-if="ingredient.quantity && ingredient.unit">
+                {{ ingredient.quantity }} {{ ingredient.unit }}
+              </template>
+              <template v-else-if="ingredient.quantity">
+                {{ ingredient.quantity }}
+              </template>
+            </td>
+          </tr>
+        </table>
       </div>
 
       <!-- Steps -->
-      <div v-if="recipe.steps && recipe.steps.length > 0">
+      <div v-if="recipe.steps && recipe.steps.length > 0" class="mb-6 mb-2">
         <h2 class="text-xl font-semibold mb-4">Étapes</h2>
-        <ol class="list-decimal list-inside space-y-3">
-          <li v-for="(step, index) in recipe.steps" :key="index" class="text-surface-700">
-            {{ step }}
-          </li>
-        </ol>
+        <div class="flex flex-col gap-4">
+          <div v-for="(step, index) in recipe.steps" :key="index" class="flex gap-3">
+            <div class="step-number">{{ index + 1 }}</div>
+            <div class="pt-1 text-surface-700">{{ step }}</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -200,3 +201,19 @@ async function handleDelete() {
 
 onMounted(fetchRecipe)
 </script>
+
+<style scoped>
+.step-number {
+  width: 32px;
+  height: 32px;
+  background-color: #3eb9a1;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+</style>
