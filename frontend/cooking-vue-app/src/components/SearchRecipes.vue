@@ -90,9 +90,7 @@ watch(
   () => route.query,
   (query) => {
     searchTitle.value = (query.title as string) || ''
-    if (query.categoryCode) {
-      searchCategory.value = query.categoryCode as string
-    }
+    searchCategory.value = (query.categoryCode as string) || null
     page.value = 1
     fetchRecipes()
   },
@@ -100,9 +98,7 @@ watch(
 
 onMounted(() => {
   searchTitle.value = (route.query.title as string) || ''
-  if (route.query.categoryCode) {
-    searchCategory.value = route.query.categoryCode as string
-  }
+  searchCategory.value = (route.query.categoryCode as string) || null
   fetchRecipes()
 })
 </script>

@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 
 const visible = ref(false)
+const gererOpen = ref(true)
+const categoriesOpen = ref(true)
 </script>
 
 <template>
@@ -29,19 +31,13 @@ const visible = ref(false)
             <li>
               <div
                 v-ripple
-                v-styleclass="{
-                  selector: '@next',
-                  enterClass: 'hidden',
-                  enterActiveClass: 'slidedown',
-                  leaveToClass: 'hidden',
-                  leaveActiveClass: 'slideup',
-                }"
+                @click="gererOpen = !gererOpen"
                 class="p-3 flex items-center justify-between text-surface-600 dark:text-surface-400 cursor-pointer rounded-md"
               >
                 <span class="font-medium">Gérer</span>
-                <i class="pi pi-chevron-down"></i>
+                <i :class="gererOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
               </div>
-              <ul class="list-none p-0 m-0 overflow-hidden">
+              <ul v-show="gererOpen" class="list-none p-0 m-0 overflow-hidden">
                 <li>
                   <router-link
                     to="/"
@@ -71,19 +67,13 @@ const visible = ref(false)
             <li>
               <div
                 v-ripple
-                v-styleclass="{
-                  selector: '@next',
-                  enterClass: 'hidden',
-                  enterActiveClass: 'slidedown',
-                  leaveToClass: 'hidden',
-                  leaveActiveClass: 'slideup',
-                }"
+                @click="categoriesOpen = !categoriesOpen"
                 class="p-3 flex items-center justify-between text-surface-600 dark:text-surface-400 cursor-pointer rounded-md"
               >
                 <span class="font-medium">Catégories</span>
-                <i class="pi pi-chevron-down"></i>
+                <i :class="categoriesOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
               </div>
-              <ul class="list-none p-0 m-0 overflow-hidden">
+              <ul v-show="categoriesOpen" class="list-none p-0 m-0 overflow-hidden">
                 <li>
                   <router-link
                     :to="{ path: '/', query: { categoryCode: 'APERITIF' } }"
