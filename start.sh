@@ -12,6 +12,14 @@ cd backend/dev
 docker-compose -f mongodb.yml up -d --build 2>&1 | tail -1
 cd ../..
 
+# Attente de MongoDB
+echo "⏳ Attente de MongoDB..."
+for i in $(seq 1 30); do
+  docker exec dev_db_1 mongosh --eval "db.runCommand({ ping: 1 })" > /dev/null 2>&1 && break
+  sleep 1
+done
+echo "✅ MongoDB prêt"
+
 # Backend
 echo "⚙️  Démarrage du backend (port 3000)..."
 cd backend/cooking-nest-app
