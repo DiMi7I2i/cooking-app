@@ -28,6 +28,7 @@ describe('Recipes CRUD', () => {
     cy.get('.p-select-overlay').should('be.visible')
     cy.get('.p-select-overlay').contains('Bon marché').click()
 
+    cy.get('#servings').type('4')
     cy.get('#preparationDuration').type('15')
     cy.get('#cookDuration').type('20')
 
