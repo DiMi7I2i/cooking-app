@@ -2,9 +2,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import LeftBar from './LeftBar.vue'
+import { useFilters } from '@/composables/useFilters'
 
 const router = useRouter()
 const searchTitle = ref('')
+const { showFilters, filtersActive, toggleFilters } = useFilters()
 
 function search() {
   const query: Record<string, string> = {}
@@ -30,6 +32,11 @@ function search() {
         @keyup.enter="search"
       />
       <Button icon="pi pi-search" @click="search" class="search-button" />
+      <Button
+        icon="pi pi-filter"
+        @click="toggleFilters"
+        :class="['filter-toggle-button', { active: filtersActive }]"
+      />
     </div>
   </header>
 </template>
@@ -69,6 +76,18 @@ header {
   background-color: white !important;
   color: #3eb9a1 !important;
   border: none !important;
+}
+
+.filter-toggle-button {
+  background-color: white !important;
+  color: #3eb9a1 !important;
+  border: none !important;
+}
+
+.filter-toggle-button.active {
+  background-color: #3eb9a1 !important;
+  color: white !important;
+  border: 2px solid white !important;
 }
 
 .application-logo {

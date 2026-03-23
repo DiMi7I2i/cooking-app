@@ -1,109 +1,102 @@
 <template>
-  <div class="p-4 max-w-6xl mx-auto">
-    <!-- Advanced filters toggle -->
-    <div class="mb-4">
-      <Button
-        :label="showFilters ? 'Masquer les filtres' : 'Filtres avancés'"
-        :icon="showFilters ? 'pi pi-chevron-up' : 'pi pi-filter'"
-        severity="secondary"
-        outlined
-        size="small"
-        @click="showFilters = !showFilters"
-      />
-    </div>
-
-    <!-- Advanced filters panel -->
-    <div v-show="showFilters" class="mb-6 bg-surface-100 rounded-lg p-4">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-        <div class="flex flex-col gap-1">
-          <label class="font-medium text-sm">Catégorie</label>
-          <Select
-            v-model="filterCategory"
-            :options="categoryOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Toutes"
-            showClear
+  <div>
+    <!-- Filter bar -->
+    <div v-show="showFilters" class="filter-bar">
+      <div class="filter-bar-content">
+        <Select
+          v-model="filterCategory"
+          :options="categoryOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Catégorie"
+          showClear
+          class="filter-select"
+        />
+        <Select
+          v-model="filterDifficulty"
+          :options="difficultyOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Difficulté"
+          showClear
+          class="filter-select"
+        />
+        <Select
+          v-model="filterCost"
+          :options="costOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Coût"
+          showClear
+          class="filter-select"
+        />
+        <div class="filter-tags">
+          <span
+            v-for="option in tagOptions"
+            :key="option.value"
+            :class="['filter-chip', { active: filterTags.includes(option.value) }]"
+            @click="toggleTag(option.value)"
+          >
+            {{ option.label }}
+          </span>
+        </div>
+        <div class="filter-actions">
+          <Button label="Appliquer" icon="pi pi-search" size="small" @click="applyFilters" />
+          <Button
+            v-if="hasActiveFilters"
+            label="Réinitialiser"
+            icon="pi pi-times"
+            severity="secondary"
+            text
+            size="small"
+            @click="resetFilters"
           />
         </div>
-        <div class="flex flex-col gap-1">
-          <label class="font-medium text-sm">Difficulté</label>
-          <Select
-            v-model="filterDifficulty"
-            :options="difficultyOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Toutes"
-            showClear
-          />
-        </div>
-        <div class="flex flex-col gap-1">
-          <label class="font-medium text-sm">Coût</label>
-          <Select
-            v-model="filterCost"
-            :options="costOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Tous"
-            showClear
-          />
-        </div>
-      </div>
-      <div class="mb-4">
-        <label class="font-medium text-sm mb-2 block">Tags</label>
-        <div class="flex flex-wrap gap-3">
-          <label v-for="option in tagOptions" :key="option.value" class="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              :value="option.value"
-              v-model="filterTags"
-              class="accent-[#3eb9a1]"
-            />
-            <span class="text-sm">{{ option.label }}</span>
-          </label>
-        </div>
-      </div>
-      <div class="flex gap-2">
-        <Button label="Appliquer" icon="pi pi-search" size="small" @click="applyFilters" />
-        <Button label="Réinitialiser" icon="pi pi-times" severity="secondary" outlined size="small" @click="resetFilters" />
       </div>
     </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="flex justify-center p-8">
-      <ProgressSpinner />
-    </div>
-
-    <!-- Results -->
-    <div v-else-if="recipes.length > 0">
-      <!-- Results count -->
-      <div class="mb-4 text-surface-600">
-        <span v-if="searchTitle">Résultats pour « <strong>{{ searchTitle }}</strong> » — </span>
-        <strong>{{ total }}</strong> recette{{ total > 1 ? 's' : '' }} trouvée{{ total > 1 ? 's' : '' }}
+    <!-- Content -->
+    <div class="p-4 max-w-6xl mx-auto">
+      <!-- Loading -->
+      <div v-if="loading" class="flex justify-center p-8">
+        <ProgressSpinner />
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <RecipeCard v-for="recipe in recipes" :key="recipe._id" :recipe="recipe" />
-      </div>
-      <Paginator
-        v-if="total > limit"
-        :rows="limit"
-        :totalRecords="total"
-        :first="(page - 1) * limit"
-        @page="onPageChange"
-        class="mt-6"
-      />
-    </div>
 
-    <!-- Empty state -->
-    <div v-else class="text-center p-8 text-surface-500">
-      <i class="pi pi-search text-4xl mb-4 block"></i>
-      <p>Aucune recette trouvée.</p>
+      <!-- Results -->
+      <div v-else-if="recipes.length > 0">
+        <!-- Results count -->
+        <div class="mb-4 text-surface-600">
+          <span v-if="searchTitle"
+            >Résultats pour « <strong>{{ searchTitle }}</strong> » —
+          </span>
+          <strong>{{ total }}</strong> recette{{ total > 1 ? 's' : '' }} trouvée{{
+            total > 1 ? 's' : ''
+          }}
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <RecipeCard v-for="recipe in recipes" :key="recipe._id" :recipe="recipe" />
+        </div>
+        <Paginator
+          v-if="total > limit"
+          :rows="limit"
+          :totalRecords="total"
+          :first="(page - 1) * limit"
+          @page="onPageChange"
+          class="mt-6"
+        />
+      </div>
+
+      <!-- Empty state -->
+      <div v-else class="text-center p-8 text-surface-500">
+        <i class="pi pi-search text-4xl mb-4 block"></i>
+        <p>Aucune recette trouvée.</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import type { Recipe } from '@/types/recipe'
@@ -113,6 +106,9 @@ import { DifficultyLabels } from '@/enums/difficulty'
 import { CostLabels } from '@/enums/cost'
 import { TagLabels } from '@/enums/tag'
 import RecipeCard from './RecipeCard.vue'
+import { useFilters } from '@/composables/useFilters'
+
+const { showFilters, filtersActive } = useFilters()
 
 const route = useRoute()
 const router = useRouter()
@@ -129,17 +125,33 @@ const page = ref(1)
 const limit = ref(9)
 const total = ref(0)
 
-// Advanced filters panel
-const showFilters = ref(false)
+// Filter bar state
 const filterCategory = ref<string | null>(null)
 const filterDifficulty = ref<string | null>(null)
 const filterCost = ref<string | null>(null)
 const filterTags = ref<string[]>([])
 
 const categoryOptions = Object.entries(CategoryLabels).map(([value, label]) => ({ value, label }))
-const difficultyOptions = Object.entries(DifficultyLabels).map(([value, label]) => ({ value, label }))
+const difficultyOptions = Object.entries(DifficultyLabels).map(([value, label]) => ({
+  value,
+  label,
+}))
 const costOptions = Object.entries(CostLabels).map(([value, label]) => ({ value, label }))
 const tagOptions = Object.entries(TagLabels).map(([value, label]) => ({ value, label }))
+
+const hasActiveFilters = computed(
+  () =>
+    filterCategory.value || filterDifficulty.value || filterCost.value || filterTags.value.length > 0
+)
+
+function toggleTag(tag: string) {
+  const index = filterTags.value.indexOf(tag)
+  if (index === -1) {
+    filterTags.value.push(tag)
+  } else {
+    filterTags.value.splice(index, 1)
+  }
+}
 
 function applyFilters() {
   const query: Record<string, string> = {}
@@ -156,7 +168,8 @@ function resetFilters() {
   filterDifficulty.value = null
   filterCost.value = null
   filterTags.value = []
-  router.push({ path: '/' })
+  filtersActive.value = false
+  router.push({ path: '/', query: searchTitle.value ? { title: searchTitle.value } : {} })
 }
 
 async function fetchRecipes() {
@@ -197,16 +210,14 @@ function syncFromQuery(query: Record<string, any>) {
   searchCost.value = (query.costCode as string) || null
   searchTags.value = (query.tags as string) || null
 
-  // Sync filter panel state
+  // Sync filter bar state
   filterCategory.value = searchCategory.value
   filterDifficulty.value = searchDifficulty.value
   filterCost.value = searchCost.value
   filterTags.value = searchTags.value ? searchTags.value.split(',') : []
 
-  // Auto-show filters if any filter is active
-  if (searchCategory.value || searchDifficulty.value || searchCost.value || searchTags.value) {
-    showFilters.value = true
-  }
+  // Update header filter button state
+  filtersActive.value = !!(searchCategory.value || searchDifficulty.value || searchCost.value || searchTags.value)
 }
 
 // React to URL query changes
@@ -224,3 +235,72 @@ onMounted(() => {
   fetchRecipes()
 })
 </script>
+
+<style scoped>
+.filter-bar {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px 16px;
+}
+
+.filter-bar-content {
+  max-width: 1152px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  min-width: 140px;
+  font-size: 0.875rem;
+}
+
+.filter-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.filter-chip:hover {
+  border-color: #3eb9a1;
+}
+
+.filter-chip.active {
+  background-color: #3eb9a1;
+  color: white;
+  border-color: #3eb9a1;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 6px;
+}
+
+@media (max-width: 640px) {
+  .filter-bar-content {
+    gap: 8px;
+  }
+
+  .filter-select {
+    min-width: 100%;
+  }
+
+  .filter-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+</style>
