@@ -111,7 +111,7 @@ const difficultySeverity = computed(() => {
 
 <style scoped>
 .tag-custom {
-  background-color: #3eb9a1 !important;
+  background-color: var(--color-primary-500) !important;
   color: white !important;
 }
 </style>
