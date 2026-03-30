@@ -44,7 +44,7 @@ function search() {
 <style lang="scss">
 header {
   display: flex;
-  background-color: #3eb9a1;
+  background-color: var(--color-primary-500);
   width: 100%;
   align-items: center;
   padding: 10px;
@@ -53,61 +53,16 @@ header {
   top: 0;
   z-index: 100;
 }
-
-.header-left {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.header-search {
-  display: flex;
-  flex: 1;
-  max-width: 700px;
-  margin-left: 40px;
-  gap: 8px;
-}
-
-.search-input {
-  flex: 1;
-}
-
-.search-button {
-  background-color: white !important;
-  color: #3eb9a1 !important;
-  border: none !important;
-}
-
-.filter-toggle-button {
-  background-color: white !important;
-  color: #3eb9a1 !important;
-  border: none !important;
-}
-
-.filter-toggle-button.active {
-  background-color: #3eb9a1 !important;
-  color: white !important;
-  border: 2px solid white !important;
-}
-
-.application-logo {
-  padding: 10px;
-}
-
-.application-name {
-  text-align: left;
-  color: white;
-  font-size: 35px;
-  padding-left: 10px;
-}
-
+.header-left { display: flex; align-items: center; flex-shrink: 0; }
+.header-search { display: flex; flex: 1; max-width: 700px; margin-left: 40px; gap: 8px; }
+.search-input { flex: 1; }
+.search-button { background-color: white !important; color: var(--color-primary-500) !important; border: none !important; }
+.filter-toggle-button { background-color: white !important; color: var(--color-primary-500) !important; border: none !important; }
+.filter-toggle-button.active { background-color: var(--color-primary-500) !important; color: white !important; border: 2px solid white !important; }
+.application-logo { padding: 10px; }
+.application-name { text-align: left; color: white; font-size: 35px; padding-left: 10px; }
 @media (max-width: 640px) {
-  .application-name {
-    display: none;
-  }
-
-  .header-search {
-    max-width: none;
-  }
+  .application-name { display: none; }
+  .header-search { max-width: none; }
 }
 </style>
