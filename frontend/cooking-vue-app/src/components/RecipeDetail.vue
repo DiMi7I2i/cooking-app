@@ -284,7 +284,7 @@ onMounted(fetchRecipe)
 
 <style scoped>
 .tag-custom {
-  background-color: #3eb9a1 !important;
+  background-color: var(--color-primary-500) !important;
   color: white !important;
 }
 
@@ -295,7 +295,7 @@ onMounted(fetchRecipe)
 .step-number {
   width: 32px;
   height: 32px;
-  background-color: #3eb9a1;
+  background-color: var(--color-primary-500);
   color: white;
   border-radius: 50%;
   display: flex;
