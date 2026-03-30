@@ -201,11 +201,14 @@
       <!-- Steps -->
       <div class="flex flex-col gap-2">
         <label class="font-medium">Étapes</label>
-        <div v-for="(step, index) in form.steps" :key="index" class="flex gap-2">
-          <span class="font-medium mt-2 text-surface-500">{{ index + 1 }}.</span>
-          <InputText v-model="form.steps[index]" class="flex-1" />
-          <Button icon="pi pi-trash" severity="danger" text @click="removeStep(index)" />
-        </div>
+        <VueDraggable v-model="form.steps" handle=".drag-handle" :animation="200" ghostClass="drag-ghost" chosenClass="drag-chosen" class="flex flex-col gap-2">
+          <div v-for="(step, index) in form.steps" :key="index" class="flex gap-2">
+            <i class="pi pi-bars drag-handle cursor-grab text-surface-400 mt-2"></i>
+            <span class="font-medium mt-2 text-surface-500">{{ index + 1 }}.</span>
+            <InputText v-model="form.steps[index]" class="flex-1" />
+            <Button icon="pi pi-trash" severity="danger" text @click="removeStep(index)" />
+          </div>
+        </VueDraggable>
         <Button
           label="Ajouter une étape"
           icon="pi pi-plus"
