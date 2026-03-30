@@ -10,7 +10,7 @@ const footerText = `© ${new Date().getFullYear()} Cooking App — Tous droits r
 
 <style lang="scss">
 footer {
-    background-color: #3EB9A1;
+    background-color: var(--color-primary-500);
     width: 100%;
     align-items: center;
     text-align: center;
