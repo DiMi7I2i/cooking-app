@@ -74,7 +74,7 @@
               type="checkbox"
               :value="option.value"
               v-model="form.tags"
-              class="accent-[#3eb9a1]"
+              class="accent-primary-500"
             />
             <span>{{ option.label }}</span>
           </label>
