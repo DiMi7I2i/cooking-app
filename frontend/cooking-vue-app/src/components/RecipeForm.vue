@@ -1,5 +1,6 @@
 <template>
   <div class="p-4 max-w-3xl mx-auto">
+    <BreadcrumbNav :segments="breadcrumbSegments" />
     <h1 class="text-2xl font-bold mb-6">
       {{ isEdit ? 'Modifier la recette' : 'Créer une recette' }}
     </h1>
@@ -215,6 +216,8 @@ import { CategoryLabels } from '@/enums/category'
 import { DifficultyLabels } from '@/enums/difficulty'
 import { CostLabels } from '@/enums/cost'
 import { TagLabels } from '@/enums/tag'
+import BreadcrumbNav from './BreadcrumbNav.vue'
+import type { BreadcrumbSegment } from './BreadcrumbNav.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -224,6 +227,20 @@ const isEdit = computed(() => !!route.params.id)
 const submitting = ref(false)
 const thumbnailFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
+
+const recipeTitle = ref('')
+const breadcrumbSegments = computed<BreadcrumbSegment[]>(() => {
+  const segments: BreadcrumbSegment[] = [
+    { label: 'Recettes', to: '/' },
+  ]
+  if (isEdit.value) {
+    segments.push({ label: recipeTitle.value || '...' })
+    segments.push({ label: 'Modifier' })
+  } else {
+    segments.push({ label: 'Nouvelle recette' })
+  }
+  return segments
+})
 
 const form = reactive({
   title: '',
@@ -385,6 +402,7 @@ onMounted(async () => {
     try {
       const recipe = await RecipeService.getRecipe(route.params.id as string)
       form.title = recipe.title
+      recipeTitle.value = recipe.title
       form.description = recipe.description || ''
       form.categoryCode = recipe.categoryCode
       form.difficultyCode = recipe.difficultyCode
