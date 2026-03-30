@@ -133,12 +133,31 @@
       <!-- Image -->
       <div class="flex flex-col gap-1">
         <label class="font-medium">Image</label>
-        <input type="file" accept="image/jpeg,image/png,image/webp" @change="onFileChange" />
-        <img
-          v-if="imagePreview"
-          :src="imagePreview"
-          alt="Aperçu"
-          class="mt-2 max-h-48 rounded-md object-cover"
+        <div
+          class="image-dropzone"
+          :class="{ 'has-image': imagePreview }"
+          @click="triggerFileInput"
+          @dragover.prevent="dragOver = true"
+          @dragleave.prevent="dragOver = false"
+          @drop.prevent="onDrop"
+          :style="{ borderColor: dragOver ? 'var(--color-primary-500)' : undefined }"
+        >
+          <template v-if="imagePreview">
+            <img :src="imagePreview" alt="Aperçu" class="image-preview" />
+            <button type="button" class="image-remove" @click.stop="removeImage">×</button>
+          </template>
+          <template v-else>
+            <i class="pi pi-image text-4xl text-surface-400"></i>
+            <span class="text-surface-500 mt-2">Glissez une image ou cliquez pour sélectionner</span>
+          </template>
+        </div>
+        <small class="text-surface-400">JPEG, PNG ou WebP — 5 Mo max</small>
+        <input
+          ref="fileInput"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          class="hidden"
+          @change="onFileChange"
         />
       </div>
 
@@ -227,6 +246,9 @@ const isEdit = computed(() => !!route.params.id)
 const submitting = ref(false)
 const thumbnailFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
+const fileInput = ref<HTMLInputElement | null>(null)
+const dragOver = ref(false)
+const removeThumbnail = ref(false)
 
 const recipeTitle = ref('')
 const breadcrumbSegments = computed<BreadcrumbSegment[]>(() => {
@@ -299,7 +321,29 @@ function onFileChange(event: Event) {
   if (file) {
     thumbnailFile.value = file
     imagePreview.value = URL.createObjectURL(file)
+    removeThumbnail.value = false
   }
+}
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function onDrop(event: DragEvent) {
+  dragOver.value = false
+  const file = event.dataTransfer?.files[0]
+  if (file && file.type.match(/^image\/(jpeg|png|webp)$/)) {
+    thumbnailFile.value = file
+    imagePreview.value = URL.createObjectURL(file)
+    removeThumbnail.value = false
+  }
+}
+
+function removeImage() {
+  thumbnailFile.value = null
+  imagePreview.value = null
+  removeThumbnail.value = true
+  if (fileInput.value) fileInput.value.value = ''
 }
 
 function validate(): boolean {
@@ -366,6 +410,9 @@ async function handleSubmit() {
     formData.append('ingredients', JSON.stringify(validIngredients))
     form.steps.filter((s) => s.trim()).forEach((step) => formData.append('steps', step))
     if (thumbnailFile.value) formData.append('thumbnail', thumbnailFile.value)
+    if (removeThumbnail.value && !thumbnailFile.value) {
+      formData.append('thumbnail', '')
+    }
 
     if (isEdit.value) {
       await RecipeService.updateRecipe(route.params.id as string, formData)
@@ -435,3 +482,39 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.image-dropzone {
+  border: 2px dashed var(--color-surface-300);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  position: relative;
+  min-height: 150px;
+}
+.image-dropzone:hover { border-color: var(--color-primary-500); }
+.image-dropzone.has-image { padding: 8px; }
+.image-preview { max-height: 200px; border-radius: 6px; object-fit: cover; }
+.image-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image-remove:hover { background: rgba(0, 0, 0, 0.8); }
+</style>
