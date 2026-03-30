@@ -5,6 +5,7 @@
     </div>
 
     <div v-else-if="recipe">
+      <BreadcrumbNav :segments="breadcrumbSegments" />
       <!-- Header -->
       <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
         <div>
@@ -130,6 +131,8 @@ import { CategoryLabels, Category } from '@/enums/category'
 import { DifficultyLabels, Difficulty } from '@/enums/difficulty'
 import { CostLabels, Cost } from '@/enums/cost'
 import { TagLabels, Tag as TagEnum } from '@/enums/tag'
+import BreadcrumbNav from './BreadcrumbNav.vue'
+import type { BreadcrumbSegment } from './BreadcrumbNav.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -142,6 +145,21 @@ const confirmDelete = ref(false)
 const categoryLabel = computed(
   () => (recipe.value ? CategoryLabels[recipe.value.categoryCode as Category] : '')
 )
+
+const breadcrumbSegments = computed<BreadcrumbSegment[]>(() => {
+  if (!recipe.value) return []
+  const segments: BreadcrumbSegment[] = [
+    { label: 'Recettes', to: '/' },
+  ]
+  if (recipe.value.categoryCode) {
+    segments.push({
+      label: categoryLabel.value,
+      to: `/?categoryCode=${recipe.value.categoryCode}`,
+    })
+  }
+  segments.push({ label: recipe.value.title })
+  return segments
+})
 const difficultyLabel = computed(
   () => (recipe.value ? DifficultyLabels[recipe.value.difficultyCode as Difficulty] : '')
 )
