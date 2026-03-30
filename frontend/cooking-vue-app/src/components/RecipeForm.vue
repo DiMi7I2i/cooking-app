@@ -234,7 +234,7 @@ const breadcrumbSegments = computed<BreadcrumbSegment[]>(() => {
     { label: 'Recettes', to: '/' },
   ]
   if (isEdit.value) {
-    segments.push({ label: recipeTitle.value || '...' })
+    segments.push({ label: recipeTitle.value || '...', to: `/recipes/${route.params.id}` })
     segments.push({ label: 'Modifier' })
   } else {
     segments.push({ label: 'Nouvelle recette' })
