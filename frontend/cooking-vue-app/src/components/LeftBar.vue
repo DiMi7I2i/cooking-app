@@ -32,7 +32,7 @@ const tagEntries = Object.entries(TagLabels)
             ></Button>
           </span>
         </div>
-        <div class="overflow-y-auto mt-4">
+        <div class="flex-1 overflow-y-auto">
           <ul class="list-none px-4 m-0">
             <li>
               <div
@@ -67,9 +67,7 @@ const tagEntries = Object.entries(TagLabels)
               </ul>
             </li>
           </ul>
-        </div>
-        <div class="overflow-y-auto mt-4">
-          <ul class="list-none px-4 m-0">
+          <ul class="list-none px-4 m-0 mt-4">
             <li>
               <div
                 v-ripple
@@ -143,9 +141,7 @@ const tagEntries = Object.entries(TagLabels)
               </ul>
             </li>
           </ul>
-        </div>
-        <div class="overflow-y-auto mt-4">
-          <ul class="list-none px-4 m-0">
+          <ul class="list-none px-4 m-0 mt-4">
             <li>
               <div
                 v-ripple
@@ -209,9 +205,7 @@ const tagEntries = Object.entries(TagLabels)
               </ul>
             </li>
           </ul>
-        </div>
-        <div class="overflow-y-auto mt-4">
-          <ul class="list-none px-4 m-0">
+          <ul class="list-none px-4 m-0 mt-4">
             <li>
               <div
                 v-ripple
@@ -255,9 +249,7 @@ const tagEntries = Object.entries(TagLabels)
               </ul>
             </li>
           </ul>
-        </div>
-        <div class="overflow-y-auto mt-4">
-          <ul class="list-none px-4 m-0">
+          <ul class="list-none px-4 m-0 mt-4">
             <li>
               <div
                 v-ripple
@@ -282,7 +274,7 @@ const tagEntries = Object.entries(TagLabels)
             </li>
           </ul>
         </div>
-        <div class="mt-auto">
+        <div class="shrink-0">
           <hr
             class="mb-3 mx-3 border-t-1 border-none border-surface-200 dark:border-surface-700"
           />
