@@ -275,13 +275,13 @@ onMounted(() => {
 }
 
 .filter-chip:hover {
-  border-color: #3eb9a1;
+  border-color: var(--color-primary-500);
 }
 
 .filter-chip.active {
-  background-color: #3eb9a1;
+  background-color: var(--color-primary-500);
   color: white;
-  border-color: #3eb9a1;
+  border-color: var(--color-primary-500);
 }
 
 .filter-actions {
