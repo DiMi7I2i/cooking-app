@@ -9,7 +9,7 @@
       <!-- Title -->
       <div class="flex flex-col gap-1">
         <label for="title" class="font-medium">Titre *</label>
-        <InputText id="title" v-model="form.title" :class="{ 'p-invalid': errors.title }" />
+        <InputText id="title" v-model="form.title" :class="{ 'p-invalid': errors.title }" @blur="validateField('title')" />
         <small v-if="errors.title" class="text-red-500">{{ errors.title }}</small>
       </div>
 
@@ -31,6 +31,7 @@
             optionValue="value"
             placeholder="Choisir"
             :class="{ 'p-invalid': errors.categoryCode }"
+            @change="validateField('categoryCode')"
           />
           <small v-if="errors.categoryCode" class="text-red-500">{{
             errors.categoryCode
@@ -46,6 +47,7 @@
             optionValue="value"
             placeholder="Choisir"
             :class="{ 'p-invalid': errors.difficultyCode }"
+            @change="validateField('difficultyCode')"
           />
           <small v-if="errors.difficultyCode" class="text-red-500">{{
             errors.difficultyCode
@@ -61,6 +63,7 @@
             optionValue="value"
             placeholder="Choisir"
             :class="{ 'p-invalid': errors.costCode }"
+            @change="validateField('costCode')"
           />
           <small v-if="errors.costCode" class="text-red-500">{{ errors.costCode }}</small>
         </div>
@@ -92,6 +95,7 @@
           min="1"
           class="p-inputtext"
           :class="{ 'p-invalid': errors.servings }"
+          @blur="validateField('servings')"
         />
         <small v-if="errors.servings" class="text-red-500">{{ errors.servings }}</small>
       </div>
@@ -176,6 +180,7 @@
               v-model="form.ingredients[index].name"
               placeholder="Nom *"
               class="flex-1"
+              @blur="validateField('ingredients')"
             />
             <input
               v-model.number="form.ingredients[index].quantity"
@@ -225,6 +230,7 @@
           :label="isEdit ? 'Enregistrer' : 'Créer'"
           icon="pi pi-check"
           :loading="submitting"
+          :disabled="!isFormValid"
         />
         <Button label="Annuler" severity="secondary" outlined @click="$router.back()" />
       </div>
@@ -352,6 +358,43 @@ function removeImage() {
   removeThumbnail.value = true
   if (fileInput.value) fileInput.value.value = ''
 }
+
+function validateField(field: keyof typeof errors) {
+  switch (field) {
+    case 'title':
+      errors.title = form.title.trim() ? '' : 'Le titre est requis'
+      break
+    case 'categoryCode':
+      errors.categoryCode = form.categoryCode ? '' : 'La catégorie est requise'
+      break
+    case 'difficultyCode':
+      errors.difficultyCode = form.difficultyCode ? '' : 'La difficulté est requise'
+      break
+    case 'costCode':
+      errors.costCode = form.costCode ? '' : 'Le coût est requis'
+      break
+    case 'servings':
+      errors.servings = form.servings && form.servings >= 1 ? '' : 'Le nombre de personnes est requis'
+      break
+    case 'ingredients':
+      errors.ingredients = form.ingredients.some((i) => i.name.trim())
+        ? ''
+        : 'Au moins un ingrédient est requis'
+      break
+  }
+}
+
+const isFormValid = computed(() => {
+  return (
+    form.title.trim() !== '' &&
+    form.categoryCode !== '' &&
+    form.difficultyCode !== '' &&
+    form.costCode !== '' &&
+    form.servings !== null &&
+    form.servings >= 1 &&
+    form.ingredients.some((i) => i.name.trim())
+  )
+})
 
 function validate(): boolean {
   let valid = true
