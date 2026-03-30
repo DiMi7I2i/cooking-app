@@ -165,27 +165,30 @@
       <div class="flex flex-col gap-2">
         <label class="font-medium">Ingrédients *</label>
         <small v-if="errors.ingredients" class="text-red-500">{{ errors.ingredients }}</small>
-        <div
-          v-for="(ingredient, index) in form.ingredients"
-          :key="index"
-          class="flex gap-2 items-center"
-        >
-          <InputText
-            v-model="form.ingredients[index].name"
-            placeholder="Nom *"
-            class="flex-1"
-          />
-          <input
-            v-model.number="form.ingredients[index].quantity"
-            type="number"
-            min="0.01"
-            step="any"
-            placeholder="Qté"
-            class="p-inputtext w-24"
-          />
-          <InputText v-model="form.ingredients[index].unit" placeholder="Unité" class="w-24" />
-          <Button icon="pi pi-trash" severity="danger" text @click="removeIngredient(index)" />
-        </div>
+        <VueDraggable v-model="form.ingredients" handle=".drag-handle" :animation="200" ghostClass="drag-ghost" chosenClass="drag-chosen" class="flex flex-col gap-2">
+          <div
+            v-for="(ingredient, index) in form.ingredients"
+            :key="index"
+            class="flex gap-2 items-center"
+          >
+            <i class="pi pi-bars drag-handle cursor-grab text-surface-400"></i>
+            <InputText
+              v-model="form.ingredients[index].name"
+              placeholder="Nom *"
+              class="flex-1"
+            />
+            <input
+              v-model.number="form.ingredients[index].quantity"
+              type="number"
+              min="0.01"
+              step="any"
+              placeholder="Qté"
+              class="p-inputtext w-24"
+            />
+            <InputText v-model="form.ingredients[index].unit" placeholder="Unité" class="w-24" />
+            <Button icon="pi pi-trash" severity="danger" text @click="removeIngredient(index)" />
+          </div>
+        </VueDraggable>
         <Button
           label="Ajouter un ingrédient"
           icon="pi pi-plus"
@@ -228,6 +231,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { VueDraggable } from 'vue-draggable-plus'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { RecipeService } from '@/services/RecipeService'
@@ -517,4 +521,8 @@ onMounted(async () => {
   justify-content: center;
 }
 .image-remove:hover { background: rgba(0, 0, 0, 0.8); }
+.drag-handle { cursor: grab; }
+.drag-handle:active { cursor: grabbing; }
+.drag-ghost { opacity: 0.4; }
+.drag-chosen { background-color: var(--color-surface-100); border-radius: 6px; }
 </style>
