@@ -1,4 +1,3 @@
-version: '3'
 services:
     db:
         build: .
@@ -9,3 +8,8 @@ services:
             MONGO_INITDB_ROOT_PASSWORD: "cooking"
         ports:
             - "27018:27017"
+        volumes:
+            - mongo-data:/data/db
+
+volumes:
+    mongo-data:

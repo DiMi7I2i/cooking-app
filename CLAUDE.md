@@ -33,9 +33,9 @@ CRUD complet (création, lecture, modification, suppression) avec recherche par 
 ### Database
 ```bash
 cd backend/dev
-docker-compose -f mongodb.yml up -d --build   # Start MongoDB
-docker-compose -f mongodb.yml down             # Stop MongoDB
-docker-compose -f mongodb.yml down -v          # Stop + reset data
+docker compose -f mongodb.yml up -d --build   # Start MongoDB
+docker compose -f mongodb.yml down             # Stop MongoDB
+docker compose -f mongodb.yml down -v          # Stop + reset data
 ```
 
 ### Backend
