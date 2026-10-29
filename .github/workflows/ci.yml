@@ -32,7 +32,7 @@ jobs:
 
       - name: E2E tests
         working-directory: backend/cooking-nest-app
-        run: npx jest --config ./test/jest-e2e.json
+        run: npm run test:e2e
 
   frontend-build:
     name: Frontend - Build & Component Tests
@@ -93,7 +93,7 @@ jobs:
 
       - name: Start backend
         working-directory: backend/cooking-nest-app
-        run: node dist/main &
+        run: node dist/main > backend.log 2>&1 &
         env:
           MONGODB_URI: mongodb://localhost:27017
           MONGODB_DBNAME: cooking
@@ -101,21 +101,28 @@ jobs:
       - name: Wait for backend
         run: |
           for i in $(seq 1 30); do
-            curl -s http://localhost:3000 && break
+            curl -sf http://127.0.0.1:3000 && exit 0
             sleep 1
           done
+          echo "Backend did not start within 30s"
+          cat backend/cooking-nest-app/backend.log
+          exit 1
 
       - name: Build frontend
         working-directory: frontend/cooking-vue-app
         run: npm run build-only
 
+      # 127.0.0.1 instead of localhost: since actions run on Node 24,
+      # "localhost" may resolve to ::1 while the server listens on IPv4 only
       - name: E2E tests
         uses: cypress-io/github-action@v6
         with:
           working-directory: frontend/cooking-vue-app
           install: false
-          start: npm run preview
-          wait-on: 'http://localhost:4173'
+          start: npm run preview -- --host 127.0.0.1
+          wait-on: 'http://127.0.0.1:4173'
+        env:
+          CYPRESS_BASE_URL: http://127.0.0.1:4173
 
   # deploy:
   #   name: Deploy
