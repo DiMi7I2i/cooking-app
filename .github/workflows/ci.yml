@@ -112,17 +112,15 @@ jobs:
         working-directory: frontend/cooking-vue-app
         run: npm run build-only
 
-      # 127.0.0.1 instead of localhost: since actions run on Node 24,
-      # "localhost" may resolve to ::1 while the server listens on IPv4 only
+      # v7.4.4+ required: v6 wait-on fails immediately on Node >= 24.20
+      # (cypress-io/github-action#1873)
       - name: E2E tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           working-directory: frontend/cooking-vue-app
           install: false
-          start: npm run preview -- --host 127.0.0.1
-          wait-on: 'http://127.0.0.1:4173'
-        env:
-          CYPRESS_BASE_URL: http://127.0.0.1:4173
+          start: npm run preview
+          wait-on: 'http://localhost:4173'
 
   # deploy:
   #   name: Deploy
