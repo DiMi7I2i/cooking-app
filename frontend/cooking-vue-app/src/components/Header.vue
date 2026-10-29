@@ -43,7 +43,8 @@ function search() {
 
 <style lang="scss">
 header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 700px) 1fr;
   background-color: var(--color-primary-500);
   width: 100%;
   align-items: center;
@@ -54,15 +55,15 @@ header {
   z-index: 100;
 }
 .header-left { display: flex; align-items: center; flex-shrink: 0; }
-.header-search { display: flex; flex: 1; max-width: 700px; margin-left: 40px; gap: 8px; }
-.search-input { flex: 1; }
+.header-search { display: flex; gap: 8px; }
+.search-input { flex: 1; min-width: 0; }
 .search-button { background-color: white !important; color: var(--color-primary-500) !important; border: none !important; }
 .filter-toggle-button { background-color: white !important; color: var(--color-primary-500) !important; border: none !important; }
 .filter-toggle-button.active { background-color: var(--color-primary-500) !important; color: white !important; border: 2px solid white !important; }
 .application-logo { padding: 10px; }
-.application-name { text-align: left; color: white; font-size: 35px; padding-left: 10px; }
+.application-name { text-align: left; color: white; font-size: 35px; padding-left: 10px; white-space: nowrap; }
 @media (max-width: 640px) {
+  header { grid-template-columns: auto minmax(0, 1fr); }
   .application-name { display: none; }
-  .header-search { max-width: none; }
 }
 </style>

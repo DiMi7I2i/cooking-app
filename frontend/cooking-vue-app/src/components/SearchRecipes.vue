@@ -240,12 +240,14 @@ onMounted(() => {
 .filter-bar {
   background-color: #f5f5f5;
   border-bottom: 1px solid #e0e0e0;
-  padding: 10px 16px;
+  padding: 10px 0;
 }
 
+/* Même conteneur que la liste (max-w-6xl + p-4) pour aligner les bords */
 .filter-bar-content {
-  max-width: 1152px;
+  max-width: var(--container-6xl);
   margin: 0 auto;
+  padding: 0 1rem;
   display: flex;
   align-items: center;
   gap: 10px;
