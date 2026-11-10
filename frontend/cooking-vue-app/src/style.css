@@ -2,6 +2,9 @@
 
 @source "../index.html";
 
+/* Les variantes dark: suivent la classe .dark (comme PrimeVue), pas prefers-color-scheme */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --color-primary-50: rgb(240 253 250);
     --color-primary-100: rgb(204 245 235);
