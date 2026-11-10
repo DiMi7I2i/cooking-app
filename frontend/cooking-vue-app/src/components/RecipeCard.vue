@@ -9,7 +9,7 @@
       >
         <img
           v-if="recipe.thumbnail"
-          :src="`http://localhost:3000${recipe.thumbnail}`"
+          :src="recipe.thumbnail"
           :alt="recipe.title"
           class="w-full h-full object-cover"
         />

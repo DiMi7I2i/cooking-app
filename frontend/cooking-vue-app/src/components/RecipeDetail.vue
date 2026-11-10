@@ -37,7 +37,7 @@
       <!-- Image -->
       <div v-if="recipe.thumbnail" class="mb-6">
         <img
-          :src="`http://localhost:3000${recipe.thumbnail}`"
+          :src="recipe.thumbnail"
           :alt="recipe.title"
           class="w-full max-h-96 object-cover rounded-lg"
         />

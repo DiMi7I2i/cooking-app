@@ -1,6 +1,6 @@
 import type { Recipe, PaginatedResponse, RecipeFilters } from '@/types/recipe'
 
-const API_BASE = 'http://localhost:3000/data/recipes'
+const API_BASE = '/data/recipes'
 
 export const RecipeService = {
   async getRecipes(filters: RecipeFilters = {}): Promise<PaginatedResponse<Recipe>> {

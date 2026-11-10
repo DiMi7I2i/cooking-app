@@ -518,7 +518,7 @@ onMounted(async () => {
           unit: i.unit || '',
         }))
       if (recipe.thumbnail) {
-        imagePreview.value = `http://localhost:3000${recipe.thumbnail}`
+        imagePreview.value = recipe.thumbnail
       }
     } catch (e) {
       toast.add({
