@@ -28,7 +28,37 @@ CRUD complet (création, lecture, modification, suppression) avec recherche par 
 - **MongoDB:** Docker Compose (`mongodb.yml`), port 27018, credentials `cooking/cooking`, base `cooking`
 - **Init data:** `recipes.js` (sample recipe: Pad Thaï)
 
+### Production — réseau local (`docker-compose.prod.yml`)
+- **Stack:** nginx (build Vue + proxy `/data` et `/uploads`) → backend NestJS → MongoDB, projet Compose `cooking-prod`
+- **Exposition:** seul nginx publie un port (`HTTP_PORT`, 80 par défaut) ; backend et MongoDB restent internes
+- **Données:** volumes `cooking-prod_mongo-data` et `cooking-prod_uploads`, séparés de la base de dev (démarre vide)
+- **Config:** `.env` à la racine (non versionné), modèle dans `.env.example`
+- **Frontend:** appelle l'API en URL relatives ; en dev, le proxy Vite (`vite.config.ts`) relaie vers `localhost:3000`
+
 ## Common Commands
+
+### Dev (tout-en-un)
+```bash
+./start.sh             # MongoDB dev + backend + frontend (Ctrl+C pour tout arrêter)
+./stop.sh              # Arrêt
+```
+
+### Production — réseau local (lancement manuel uniquement, jamais automatique)
+```bash
+cp .env.example .env   # Une seule fois, puis adapter (mot de passe MongoDB, port)
+./deploy.sh            # Déploie la branche main locale
+./deploy.sh v1.0       # Déploie un tag, une branche ou un commit
+docker compose -p cooking-prod logs -f   # Logs de la prod
+docker compose -p cooking-prod down      # Arrêt (données conservées)
+```
+`deploy.sh` extrait le commit choisi (`git archive`) : les modifications non commitées ne sont jamais déployées.
+
+### Tests des scripts
+```bash
+bash scripts/tests/common.test.sh       # Fonctions Docker partagées
+bash scripts/tests/deploy.test.sh       # deploy.sh (faux docker, rapide)
+bash scripts/tests/prod-stack.test.sh   # Stack de prod réelle et jetable (port 8099, ~2-3 min)
+```
 
 ### Database
 ```bash
