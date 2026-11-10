@@ -1,0 +1,7 @@
+node_modules
+dist
+cypress/screenshots
+cypress/videos
+*.log
+Dockerfile
+.dockerignore
