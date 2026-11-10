@@ -1,6 +1,15 @@
 #!/bin/bash
 
+# Toujours travailler depuis la racine du projet, quel que soit le dossier d'appel
+cd "$(dirname "$0")" || exit 1
+source scripts/common.sh
+
 echo "🚀 Démarrage de Cooking App..."
+
+# Prérequis Docker (installation, droits sur le socket, démon)
+check_docker || exit 1
+detect_compose || exit 1
+compose() { "${COMPOSE[@]}" -f backend/dev/mongodb.yml "$@"; }
 
 # Nettoyage des ports
 lsof -ti:3000 | xargs -r kill -9 2>/dev/null
@@ -8,21 +17,30 @@ lsof -ti:5173 | xargs -r kill -9 2>/dev/null
 
 # MongoDB
 echo "📦 Démarrage de MongoDB..."
-cd backend/dev
-docker-compose -f mongodb.yml up -d --build 2>&1 | tail -1
-cd ../..
+if ! compose up -d --build; then
+  echo "❌ Échec du démarrage de MongoDB (voir l'erreur ci-dessus)." >&2
+  exit 1
+fi
 
 # Attente de MongoDB
 echo "⏳ Attente de MongoDB..."
+MONGO_READY=0
 for i in $(seq 1 30); do
-  docker exec dev_db_1 mongosh --eval "db.runCommand({ ping: 1 })" > /dev/null 2>&1 && break
+  if compose exec -T db mongosh --quiet --eval "db.runCommand({ ping: 1 })" > /dev/null 2>&1; then
+    MONGO_READY=1
+    break
+  fi
   sleep 1
 done
+if [ "$MONGO_READY" -ne 1 ]; then
+  echo "❌ MongoDB ne répond pas après 30 s. Logs : ${COMPOSE[*]} -f backend/dev/mongodb.yml logs db" >&2
+  exit 1
+fi
 echo "✅ MongoDB prêt"
 
 # Backend
 echo "⚙️  Démarrage du backend (port 3000)..."
-cd backend/cooking-nest-app
+cd backend/cooking-nest-app || exit 1
 npm run start:dev &
 BACKEND_PID=$!
 cd ../..
@@ -37,7 +55,7 @@ echo "✅ Backend prêt"
 
 # Frontend
 echo "🎨 Démarrage du frontend (port 5173)..."
-cd frontend/cooking-vue-app
+cd frontend/cooking-vue-app || exit 1
 npm run dev &
 FRONTEND_PID=$!
 cd ../..
@@ -54,6 +72,14 @@ echo ""
 echo "Appuyez sur Ctrl+C pour tout arrêter"
 
 # Arrêt propre avec Ctrl+C
-trap "echo ''; echo '🛑 Arrêt...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; cd backend/dev && docker-compose -f mongodb.yml down; echo '✅ Arrêté'; exit 0" SIGINT SIGTERM
+cleanup() {
+  echo ''
+  echo '🛑 Arrêt...'
+  kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null
+  compose down
+  echo '✅ Arrêté'
+  exit 0
+}
+trap cleanup SIGINT SIGTERM
 
 wait
