@@ -173,13 +173,13 @@
           <div
             v-for="(ingredient, index) in form.ingredients"
             :key="index"
-            class="flex gap-2 items-center"
+            class="ingredient-row"
           >
-            <i class="pi pi-bars drag-handle cursor-grab text-surface-400"></i>
+            <i class="pi pi-bars drag-handle cursor-grab text-surface-400 ingredient-handle"></i>
             <InputText
               v-model="form.ingredients[index].name"
               placeholder="Nom *"
-              class="flex-1"
+              class="ingredient-name"
               @blur="validateField('ingredients')"
             />
             <input
@@ -188,10 +188,20 @@
               min="0.01"
               step="any"
               placeholder="Qté"
-              class="p-inputtext w-24"
+              class="p-inputtext ingredient-quantity"
             />
-            <InputText v-model="form.ingredients[index].unit" placeholder="Unité" class="w-24" />
-            <Button icon="pi pi-trash" severity="danger" text @click="removeIngredient(index)" />
+            <InputText
+              v-model="form.ingredients[index].unit"
+              placeholder="Unité"
+              class="ingredient-unit"
+            />
+            <Button
+              icon="pi pi-trash"
+              severity="danger"
+              text
+              class="ingredient-remove"
+              @click="removeIngredient(index)"
+            />
           </div>
         </VueDraggable>
         <Button
@@ -579,6 +589,33 @@ onMounted(async () => {
   justify-content: center;
 }
 .image-remove:hover { background: rgba(0, 0, 0, 0.8); }
+/* Ligne d'ingrédient : toujours poignée + nom + quantité + unité + corbeille sur une
+   seule ligne. Colonnes minmax(0, …) et min-width: 0 : sans cela les champs gardent
+   leur largeur intrinsèque et la ligne déborde de l'écran. */
+.ingredient-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 6rem 6rem auto;
+  grid-template-areas: 'handle name quantity unit remove';
+  align-items: center;
+  gap: 8px;
+}
+.ingredient-handle { grid-area: handle; }
+.ingredient-name { grid-area: name; }
+.ingredient-quantity { grid-area: quantity; }
+.ingredient-unit { grid-area: unit; }
+.ingredient-remove { grid-area: remove; }
+.ingredient-name,
+.ingredient-quantity,
+.ingredient-unit { width: 100%; min-width: 0; }
+@media (max-width: 640px) {
+  /* Toujours une seule ligne : quantité et unité plus étroites, le nom prend le reste */
+  .ingredient-row {
+    grid-template-columns: auto minmax(0, 1fr) 4rem 4.5rem auto;
+    gap: 4px;
+  }
+  .ingredient-quantity,
+  .ingredient-unit { padding-inline: 0.5rem; }
+}
 .drag-handle { cursor: grab; }
 .drag-handle:active { cursor: grabbing; }
 .drag-ghost { opacity: 0.4; }

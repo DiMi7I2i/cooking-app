@@ -15,7 +15,8 @@ import Footer from './components/Footer.vue'
   display: grid;
   width: 100%;
   min-height: 100vh;
-  grid-template-columns: 1fr;
+  /* minmax(0, 1fr) : un contenu trop large ne doit pas élargir la colonne (et le header avec) */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   padding: 0;
 }
