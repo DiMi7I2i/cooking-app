@@ -63,7 +63,9 @@ header {
 .application-logo { padding: 10px; }
 .application-name { text-align: left; color: white; font-size: 35px; padding-left: 10px; white-space: nowrap; }
 @media (max-width: 640px) {
-  header { grid-template-columns: auto minmax(0, 1fr); }
-  .application-name { display: none; }
+  /* Portrait mobile : tout l'espace pour la recherche (burger + champ + boutons) */
+  header { grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 8px; }
+  .application-logo, .application-name { display: none; }
+  .header-search { gap: 6px; }
 }
 </style>

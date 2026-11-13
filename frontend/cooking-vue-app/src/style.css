@@ -69,6 +69,13 @@ body {
     padding: 1rem;
 }
 
+/* Mobile : header et footer bord à bord (les pages gardent leur propre marge) */
+@media (max-width: 640px) {
+    body {
+        padding: 0;
+    }
+}
+
 .card {
     background: var(--card-bg);
     border: var(--card-border);
