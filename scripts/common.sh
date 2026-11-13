@@ -44,3 +44,21 @@ detect_compose() {
     return 1
   fi
 }
+
+# Lit une valeur du .env à la racine du projet (vide si absente) : env_value <CLÉ>
+env_value() {
+  [ -f .env ] && sed -n "s/^$1=//p" .env | tail -n1
+}
+
+# Affiche l'id du conteneur MongoDB en cours d'exécution du projet Compose donné.
+# Retourne 1 avec un message explicite si la stack ne tourne pas.
+prod_mongo_container() {
+  local id
+  id="$(docker ps -q --filter "label=com.docker.compose.project=$1" \
+    --filter "label=com.docker.compose.service=mongo")"
+  if [ -z "$id" ]; then
+    echo "❌ La stack $1 ne tourne pas (MongoDB introuvable). Lancez d'abord ./deploy.sh" >&2
+    return 1
+  fi
+  echo "$id"
+}

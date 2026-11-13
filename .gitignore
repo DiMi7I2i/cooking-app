@@ -1,2 +1,5 @@
 # Configuration locale de la stack de production (mots de passe)
 .env
+
+# Sauvegardes de la prod (backup.sh)
+backups/

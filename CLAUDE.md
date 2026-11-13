@@ -53,11 +53,22 @@ docker compose -p cooking-prod down      # Arrêt (données conservées)
 ```
 `deploy.sh` extrait le commit choisi (`git archive`) : les modifications non commitées ne sont jamais déployées.
 
+### Sauvegardes de la production
+```bash
+./backup.sh                                   # Archive datée (base + images) dans backups/, garde les 14 dernières
+./restore.sh backups/cooking-<date>.tar.gz    # Restaure (remplace tout, demande confirmation ; --yes pour forcer)
+```
+Réglages facultatifs dans `.env` : `BACKUP_DIR`, `BACKUP_KEEP`. Sauvegarde quotidienne à 3 h via `crontab -e` :
+```
+0 3 * * * /chemin/vers/cooking-app/backup.sh >> $HOME/cooking-backup.log 2>&1
+```
+
 ### Tests des scripts
 ```bash
 bash scripts/tests/common.test.sh       # Fonctions Docker partagées
 bash scripts/tests/deploy.test.sh       # deploy.sh (faux docker, rapide)
 bash scripts/tests/prod-stack.test.sh   # Stack de prod réelle et jetable (port 8099, ~2-3 min)
+bash scripts/tests/backup.test.sh       # backup.sh + restore.sh sur une stack jetable (port 8099)
 ```
 
 ### Database
