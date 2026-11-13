@@ -62,3 +62,53 @@ prod_mongo_container() {
   fi
   echo "$id"
 }
+
+# PIDs des processus à l'écoute sur un port TCP (jamais les clients connectés,
+# comme un navigateur ouvert sur l'appli)
+listening_pids() {
+  lsof -ti "tcp:$1" -sTCP:LISTEN 2>/dev/null
+}
+
+# Arrête un groupe de processus : TERM, puis KILL s'il résiste plus de 5 s
+stop_process_group() {
+  kill -TERM -- "-$1" 2>/dev/null || return 0
+  for _ in $(seq 1 10); do
+    kill -0 -- "-$1" 2>/dev/null || return 0
+    sleep 0.5
+  done
+  kill -KILL -- "-$1" 2>/dev/null
+  return 0
+}
+
+# Arrête les processus à l'écoute sur un port : TERM, puis KILL après 5 s
+stop_listeners() {
+  local pids
+  pids="$(listening_pids "$1")"
+  [ -z "$pids" ] && return 0
+  kill -TERM $pids 2>/dev/null
+  for _ in $(seq 1 10); do
+    [ -z "$(listening_pids "$1")" ] && return 0
+    sleep 0.5
+  done
+  pids="$(listening_pids "$1")"
+  [ -n "$pids" ] && kill -KILL $pids 2>/dev/null
+  return 0
+}
+
+# Arrête les processus de dev du projet lancés par start.sh (npm, watcher Nest,
+# serveurs), y compris ceux d'un lancement interrompu. À appeler depuis la racine.
+stop_dev_processes() {
+  local pgid
+  if [ -f .dev-pids ]; then
+    while read -r pgid; do
+      # Ne touche qu'à un groupe appartenant bien à ce projet (PID réutilisé sinon)
+      [ -n "$pgid" ] && ps -o args= -g "$pgid" 2>/dev/null | grep -qF "$PWD" \
+        && stop_process_group "$pgid"
+    done < .dev-pids
+    rm -f .dev-pids
+  fi
+  stop_listeners 3000
+  stop_listeners 5173
+  pkill -TERM -f "$PWD/backend/cooking-nest-app/node_modules/.bin/nest start" 2>/dev/null
+  return 0
+}

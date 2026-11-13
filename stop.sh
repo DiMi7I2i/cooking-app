@@ -5,9 +5,9 @@ source scripts/common.sh
 
 echo "Arrêt de Cooking App..."
 
-# Backend & Frontend
-lsof -ti:3000 | xargs -r kill -9 2>/dev/null
-lsof -ti:5173 | xargs -r kill -9 2>/dev/null
+# Backend & Frontend : groupes notés par start.sh, puis serveurs encore à
+# l'écoute sur 3000/5173 et watcher Nest orphelin (jamais un navigateur connecté)
+stop_dev_processes
 echo "Backend et frontend arrêtés"
 
 # MongoDB

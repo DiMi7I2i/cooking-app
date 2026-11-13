@@ -11,9 +11,8 @@ check_docker || exit 1
 detect_compose || exit 1
 compose() { "${COMPOSE[@]}" -f backend/dev/mongodb.yml "$@"; }
 
-# Nettoyage des ports
-lsof -ti:3000 | xargs -r kill -9 2>/dev/null
-lsof -ti:5173 | xargs -r kill -9 2>/dev/null
+# Restes d'un lancement précédent (ports 3000/5173, watcher Nest orphelin)
+stop_dev_processes
 
 # MongoDB
 echo "📦 Démarrage de MongoDB..."
@@ -38,12 +37,28 @@ if [ "$MONGO_READY" -ne 1 ]; then
 fi
 echo "✅ MongoDB prêt"
 
+# Arrêt propre avec Ctrl+C : chaque serveur tourne dans son propre groupe de
+# processus (setsid), arrêté en entier (npm + watcher Nest/Vite + serveur)
+cleanup() {
+  echo ''
+  echo '🛑 Arrêt...'
+  [ -n "$BACKEND_PGID" ] && stop_process_group "$BACKEND_PGID"
+  [ -n "$FRONTEND_PGID" ] && stop_process_group "$FRONTEND_PGID"
+  rm -f .dev-pids
+  compose down
+  echo '✅ Arrêté'
+  exit 0
+}
+trap cleanup SIGINT SIGTERM
+
 # Backend
 echo "⚙️  Démarrage du backend (port 3000)..."
 cd backend/cooking-nest-app || exit 1
-npm run start:dev &
-BACKEND_PID=$!
+setsid npm run start:dev &
+BACKEND_PGID=$!
 cd ../..
+# Groupes notés pour ./stop.sh (lancé depuis un autre terminal)
+echo "$BACKEND_PGID" > .dev-pids
 
 # Attente du backend
 echo "⏳ Attente du backend..."
@@ -56,9 +71,10 @@ echo "✅ Backend prêt"
 # Frontend
 echo "🎨 Démarrage du frontend (port 5173)..."
 cd frontend/cooking-vue-app || exit 1
-npm run dev &
-FRONTEND_PID=$!
+setsid npm run dev &
+FRONTEND_PGID=$!
 cd ../..
+echo "$FRONTEND_PGID" >> .dev-pids
 
 sleep 2
 echo ""
@@ -70,16 +86,5 @@ echo "  MongoDB  : localhost:27018"
 echo "========================================="
 echo ""
 echo "Appuyez sur Ctrl+C pour tout arrêter"
-
-# Arrêt propre avec Ctrl+C
-cleanup() {
-  echo ''
-  echo '🛑 Arrêt...'
-  kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null
-  compose down
-  echo '✅ Arrêté'
-  exit 0
-}
-trap cleanup SIGINT SIGTERM
 
 wait

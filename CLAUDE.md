@@ -69,6 +69,7 @@ bash scripts/tests/common.test.sh       # Fonctions Docker partagées
 bash scripts/tests/deploy.test.sh       # deploy.sh (faux docker, rapide)
 bash scripts/tests/prod-stack.test.sh   # Stack de prod réelle et jetable (port 8099, ~2-3 min)
 bash scripts/tests/backup.test.sh       # backup.sh + restore.sh sur une stack jetable (port 8099)
+bash scripts/tests/devstack.test.sh     # start.sh / stop.sh réels (~2 min, ports 3000/5173 libres)
 ```
 
 ### Database

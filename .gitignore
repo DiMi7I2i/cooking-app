@@ -3,3 +3,6 @@
 
 # Sauvegardes de la prod (backup.sh)
 backups/
+
+# Processus de la stack de dev (start.sh / stop.sh)
+.dev-pids
