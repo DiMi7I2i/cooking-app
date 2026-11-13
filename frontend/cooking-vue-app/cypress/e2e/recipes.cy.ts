@@ -40,7 +40,7 @@ describe('Recipes CRUD', () => {
 
     // Add a step
     cy.contains('Ajouter une étape').click()
-    cy.get('input').last().type('Mélanger la farine et les oeufs')
+    cy.get('.step-input').last().type('Mélanger la farine et les oeufs')
 
     // Submit
     cy.get('button[type="submit"]').click()

@@ -210,7 +210,14 @@
           <div v-for="(step, index) in form.steps" :key="index" class="flex gap-2">
             <i class="pi pi-bars drag-handle cursor-grab text-surface-400 mt-2"></i>
             <span class="font-medium mt-2 text-surface-500">{{ index + 1 }}.</span>
-            <InputText v-model="form.steps[index]" class="flex-1" />
+            <!-- Une ligne qui s'agrandit avec le texte ; Entrée bloqué : une étape = un paragraphe -->
+            <Textarea
+              v-model="form.steps[index]"
+              rows="1"
+              autoResize
+              class="flex-1 step-input"
+              @keydown.enter.prevent
+            />
             <Button icon="pi pi-trash" severity="danger" text @click="removeStep(index)" />
           </div>
         </VueDraggable>
