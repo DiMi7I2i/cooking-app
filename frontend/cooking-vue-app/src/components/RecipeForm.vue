@@ -5,7 +5,7 @@
       {{ isEdit ? 'Modifier la recette' : 'Créer une recette' }}
     </h1>
 
-    <form @submit.prevent="handleSubmit" class="flex flex-col gap-4">
+    <form ref="formEl" @submit.prevent="handleSubmit" class="flex flex-col gap-4">
       <!-- Title -->
       <div class="flex flex-col gap-1">
         <label for="title" class="font-medium">Titre *</label>
@@ -230,7 +230,6 @@
           :label="isEdit ? 'Enregistrer' : 'Créer'"
           icon="pi pi-check"
           :loading="submitting"
-          :disabled="!isFormValid"
         />
         <Button label="Annuler" severity="secondary" outlined @click="$router.back()" />
       </div>
@@ -239,7 +238,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
@@ -259,6 +258,7 @@ const isEdit = computed(() => !!route.params.id)
 const submitting = ref(false)
 const thumbnailFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
+const formEl = ref<HTMLFormElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const dragOver = ref(false)
 const removeThumbnail = ref(false)
@@ -384,17 +384,6 @@ function validateField(field: keyof typeof errors) {
   }
 }
 
-const isFormValid = computed(() => {
-  return (
-    form.title.trim() !== '' &&
-    form.categoryCode !== '' &&
-    form.difficultyCode !== '' &&
-    form.costCode !== '' &&
-    form.servings !== null &&
-    form.servings >= 1 &&
-    form.ingredients.some((i) => i.name.trim())
-  )
-})
 
 function validate(): boolean {
   let valid = true
@@ -433,8 +422,24 @@ function validate(): boolean {
   return valid
 }
 
+// Amène au premier champ en erreur : sur mobile, le bouton est en bas d'un long
+// formulaire et les erreurs seraient sinon hors de l'écran
+function focusFirstError() {
+  const firstError = formEl.value?.querySelector<HTMLElement>('.p-invalid, small.text-red-500')
+  if (!firstError) return
+  const focusable = firstError.matches('input, textarea, [tabindex]')
+    ? firstError
+    : firstError.querySelector<HTMLElement>('input, textarea, [tabindex]:not([tabindex="-1"])')
+  firstError.scrollIntoView({ block: 'center' })
+  focusable?.focus({ preventScroll: true })
+}
+
 async function handleSubmit() {
-  if (!validate()) return
+  if (!validate()) {
+    await nextTick()
+    focusFirstError()
+    return
+  }
 
   submitting.value = true
   try {

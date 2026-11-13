@@ -109,7 +109,7 @@ Option C : breadcrumb intégré dans le contenu (pas de barre dédiée), avec le
 - Validation au blur (quand on quitte un champ) — pas pendant la saisie pour ne pas être intrusif
 - Pattern unique pour les erreurs : classe `p-invalid` sur le champ + message rouge en dessous
 - Champs requis : indicateur visuel clair (astérisque + bordure rouge si vide après blur)
-- Bouton submit désactivé tant que les champs requis ne sont pas remplis (`title`, `categoryCode`, `difficultyCode`, `costCode`, `servings` non vides + au moins un ingrédient avec un `name` non vide)
+- ~~Bouton submit désactivé tant que les champs requis ne sont pas remplis~~ — **remplacé le 2026-11-13** : sur mobile, on touche le bouton sans avoir quitté les champs, donc aucune erreur ne s'affichait et le bouton grisé ne réagissait pas. Le bouton submit est désormais toujours actif : au clic, il valide tous les champs requis (`title`, `categoryCode`, `difficultyCode`, `costCode`, `servings` non vides + au moins un ingrédient avec un `name` non vide), affiche toutes les erreurs et amène au premier champ en erreur (défilement + focus)
 
 ### Fichiers impactés
 - `src/components/RecipeForm.vue` — upload stylé, drag-and-drop, validation
