@@ -122,6 +122,65 @@ jobs:
           start: npm run preview
           wait-on: 'http://localhost:4173'
 
+  # Tests des scripts shell (scripts/tests/*.test.sh) : chacun affiche ses
+  # vérifications (✔ / ✘) et sort en erreur au moindre échec.
+
+  scripts-fast:
+    name: Scripts - Tests rapides (common, deploy, certificats)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Faux docker : aucun conteneur n'est lancé
+      - name: Fonctions Docker partagées (common.sh)
+        run: bash scripts/tests/common.test.sh
+
+      - name: deploy.sh
+        run: bash scripts/tests/deploy.test.sh
+
+      - name: Certificats HTTPS (https-cert.sh)
+        run: bash scripts/tests/https-cert.test.sh
+
+  scripts-prod-stack:
+    name: Scripts - Stack de prod (HTTPS, sauvegardes)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Stack jetable (projet cooking-prod-test, ports 8099/8449, volumes supprimés)
+      - name: Stack de prod réelle en HTTPS
+        run: bash scripts/tests/prod-stack.test.sh
+
+      # Réutilise les images construites à l'étape précédente
+      - name: backup.sh et restore.sh
+        run: bash scripts/tests/backup.test.sh
+
+  scripts-devstack:
+    name: Scripts - Stack de dev (start.sh / stop.sh)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install backend dependencies
+        working-directory: backend/cooking-nest-app
+        run: npm install
+
+      - name: Install frontend dependencies
+        working-directory: frontend/cooking-vue-app
+        run: npm install
+        env:
+          CYPRESS_INSTALL_BINARY: 0   # Cypress inutile ici
+
+      - name: start.sh / stop.sh réels
+        run: bash scripts/tests/devstack.test.sh
+
   # deploy:
   #   name: Deploy
   #   runs-on: ubuntu-latest
