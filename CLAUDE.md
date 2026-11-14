@@ -43,6 +43,14 @@ CRUD complet (création, lecture, modification, suppression) avec recherche par 
 ./stop.sh              # Arrêt
 ```
 
+### Dev en HTTPS — tester depuis un téléphone du réseau local
+Le partage natif d'un fichier (bouton « Partager ») exige HTTPS hors `localhost`.
+```bash
+scripts/dev-https-cert.sh               # Autorité locale (créée une fois, ~/.local/share/cooking-app-dev-ca) + certificat pour les IP du PC
+cd frontend/cooking-vue-app && npm run dev:https   # Vite en HTTPS sur le port 5174, ouvert au réseau (backend : ./start.sh)
+```
+Installer une seule fois `frontend/cooking-vue-app/.certs/cooking-dev-ca.crt` sur le téléphone (le script explique comment), puis ouvrir `https://<IP du PC>:5174`.
+
 ### Production — réseau local (lancement manuel uniquement, jamais automatique)
 ```bash
 cp .env.example .env   # Une seule fois, puis adapter (mot de passe MongoDB, port)
@@ -70,6 +78,7 @@ bash scripts/tests/deploy.test.sh       # deploy.sh (faux docker, rapide)
 bash scripts/tests/prod-stack.test.sh   # Stack de prod réelle et jetable (port 8099, ~2-3 min)
 bash scripts/tests/backup.test.sh       # backup.sh + restore.sh sur une stack jetable (port 8099)
 bash scripts/tests/devstack.test.sh     # start.sh / stop.sh réels (~2 min, ports 3000/5173 libres)
+bash scripts/tests/dev-https-cert.test.sh   # Certificat HTTPS de dev (rapide, openssl)
 ```
 
 ### Database

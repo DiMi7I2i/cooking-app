@@ -6,3 +6,6 @@ backups/
 
 # Processus de la stack de dev (start.sh / stop.sh)
 .dev-pids
+
+# Certificat HTTPS de dev (scripts/dev-https-cert.sh)
+frontend/cooking-vue-app/.certs/
