@@ -17,7 +17,17 @@
             <Tag v-for="tag in tagLabels" :key="tag" :value="tag" class="tag-custom" />
           </div>
         </div>
-        <div class="flex gap-2">
+        <div class="grid grid-cols-3 gap-2 w-full sm:flex sm:w-auto">
+          <Button
+            label="Partager"
+            icon="pi pi-share-alt"
+            outlined
+            :loading="sharing"
+            aria-haspopup="true"
+            aria-controls="share-menu"
+            @click="onShareClick"
+          />
+          <Menu id="share-menu" ref="shareMenu" :model="shareMenuItems" :popup="true" />
           <Button
             label="Modifier"
             icon="pi pi-pencil"
@@ -131,6 +141,17 @@ import { CategoryLabels, Category } from '@/enums/category'
 import { DifficultyLabels, Difficulty } from '@/enums/difficulty'
 import { CostLabels, Cost } from '@/enums/cost'
 import { TagLabels, Tag as TagEnum } from '@/enums/tag'
+import { formatQuantity, isFraction as isFractionFor } from '@/utils/servings'
+import {
+  buildRecipePdf,
+  canShareFiles,
+  downloadPdf,
+  loadPdfMake,
+  pdfFileName,
+  sharePdf,
+} from '@/services/RecipePdfService'
+import Menu from 'primevue/menu'
+import type { MenuItem } from 'primevue/menuitem'
 import BreadcrumbNav from './BreadcrumbNav.vue'
 import type { BreadcrumbSegment } from './BreadcrumbNav.vue'
 
@@ -141,6 +162,55 @@ const toast = useToast()
 const recipe = ref<Recipe | null>(null)
 const loading = ref(false)
 const confirmDelete = ref(false)
+
+// --- Partage en PDF ---
+const sharing = ref(false)
+const shareMenu = ref<InstanceType<typeof Menu> | null>(null)
+
+const shareMenuItems = computed<MenuItem[]>(() => {
+  const items: MenuItem[] = []
+  if (canShareFiles()) {
+    items.push({ label: 'Partager le PDF…', icon: 'pi pi-share-alt', command: () => exportPdf('share') })
+  }
+  items.push({ label: 'Télécharger le PDF', icon: 'pi pi-download', command: () => exportPdf('download') })
+  return items
+})
+
+function isMobile() {
+  return window.matchMedia('(max-width: 639px)').matches
+}
+
+function onShareClick(event: Event) {
+  if (isMobile()) {
+    // Mobile : directement la feuille de partage native (ou téléchargement)
+    exportPdf(canShareFiles() ? 'share' : 'download')
+  } else {
+    shareMenu.value?.toggle(event)
+  }
+}
+
+async function exportPdf(mode: 'share' | 'download') {
+  if (!recipe.value || sharing.value) return
+  sharing.value = true
+  try {
+    const blob = await buildRecipePdf(recipe.value, selectedServings.value)
+    const fileName = pdfFileName(recipe.value.title)
+    if (mode === 'share') {
+      await sharePdf(blob, fileName, recipe.value.title)
+    } else {
+      downloadPdf(blob, fileName)
+    }
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: 'Impossible de générer le PDF',
+      life: 3000,
+    })
+  } finally {
+    sharing.value = false
+  }
+}
 
 const categoryLabel = computed(
   () => (recipe.value ? CategoryLabels[recipe.value.categoryCode as Category] : '')
@@ -195,43 +265,12 @@ function decreaseServings() {
   if (selectedServings.value > 1) selectedServings.value--
 }
 
-function toFraction(value: number): string {
-  const fractions: [number, string][] = [
-    [0.25, '¼'],
-    [0.33, '⅓'],
-    [0.5, '½'],
-    [0.67, '⅔'],
-    [0.75, '¾'],
-  ]
-  const whole = Math.floor(value)
-  const decimal = value - whole
-
-  if (decimal < 0.01) return String(whole)
-
-  for (const [threshold, symbol] of fractions) {
-    if (Math.abs(decimal - threshold) < 0.05) {
-      return whole > 0 ? `${whole}${symbol}` : symbol
-    }
-  }
-
-  return value.toFixed(1)
-}
-
 function isFraction(originalQuantity: number): boolean {
-  if (!recipe.value?.servings) return false
-  const ratio = selectedServings.value / recipe.value.servings
-  const adjusted = originalQuantity * ratio
-  return adjusted < 1 && adjusted % 1 !== 0
+  return isFractionFor(originalQuantity, recipe.value?.servings, selectedServings.value)
 }
 
 function adjustedQuantity(originalQuantity: number, hasUnit: boolean): string {
-  if (!recipe.value?.servings) return String(originalQuantity)
-  const ratio = selectedServings.value / recipe.value.servings
-  const adjusted = originalQuantity * ratio
-
-  if (adjusted % 1 === 0) return String(adjusted)
-  if (!hasUnit && adjusted < 1) return toFraction(adjusted)
-  return adjusted.toFixed(1)
+  return formatQuantity(originalQuantity, hasUnit, recipe.value?.servings, selectedServings.value)
 }
 
 const totalDuration = computed(() => {
@@ -297,7 +336,11 @@ async function handleDelete() {
   confirmDelete.value = false
 }
 
-onMounted(fetchRecipe)
+onMounted(() => {
+  fetchRecipe()
+  // Précharge pdfmake : le partage natif doit suivre le clic de près
+  loadPdfMake().catch(() => {})
+})
 </script>
 
 <style scoped>
