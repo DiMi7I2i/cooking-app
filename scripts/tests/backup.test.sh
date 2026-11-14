@@ -1,6 +1,6 @@
 #!/bin/bash
 # Tests de backup.sh et restore.sh sur une stack de prod jetable
-# (projet cooking-prod-test, port 8099, volumes supprimés à la fin).
+# (projet cooking-prod-test, ports 8099/8449, volumes supprimés à la fin).
 # Usage : bash scripts/tests/backup.test.sh
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT" || exit 1
@@ -9,12 +9,18 @@ check_docker || exit 1
 detect_compose || exit 1
 
 PORT=8099
-BASE="http://127.0.0.1:$PORT"
+HTTPS_PORT=8449
+BASE="https://127.0.0.1:$HTTPS_PORT"
 WORK="$(mktemp -d)"
+CA_DIR="$WORK/ca" OUT_DIR="$WORK/certs" bash scripts/https-cert.sh --prod 127.0.0.1 >/dev/null || exit 1
+export CERTS_DIR="$WORK/certs"
+curl() { command curl --cacert "$WORK/ca/rootCA.crt" "$@"; }
+export WORK; export -f curl
 export COOKING_PROJECT=cooking-prod-test
 export BACKUP_DIR="$WORK/backups"
 cat > "$WORK/.env" <<EOF
 HTTP_PORT=$PORT
+HTTPS_PORT=$HTTPS_PORT
 MONGO_USER=cooking
 MONGO_PASSWORD=test-password
 EOF

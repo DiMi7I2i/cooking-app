@@ -30,7 +30,8 @@ CRUD complet (création, lecture, modification, suppression) avec recherche par 
 
 ### Production — réseau local (`docker-compose.prod.yml`)
 - **Stack:** nginx (build Vue + proxy `/data` et `/uploads`) → backend NestJS → MongoDB, projet Compose `cooking-prod`
-- **Exposition:** seul nginx publie un port (`HTTP_PORT`, 80 par défaut) ; backend et MongoDB restent internes
+- **Exposition:** seul nginx publie des ports : HTTPS (`HTTPS_PORT`, 443) et HTTP (`HTTP_PORT`, 80, redirige vers HTTPS) ; backend et MongoDB restent internes
+- **HTTPS:** certificat de l'autorité locale (`scripts/https-cert.sh --prod`) monté en lecture seule dans nginx ; config `frontend/cooking-vue-app/nginx.conf.template`
 - **Données:** volumes `cooking-prod_mongo-data` et `cooking-prod_uploads`, séparés de la base de dev (démarre vide)
 - **Config:** `.env` à la racine (non versionné), modèle dans `.env.example`
 - **Frontend:** appelle l'API en URL relatives ; en dev, le proxy Vite (`vite.config.ts`) relaie vers `localhost:3000`
@@ -43,23 +44,28 @@ CRUD complet (création, lecture, modification, suppression) avec recherche par 
 ./stop.sh              # Arrêt
 ```
 
-### Dev en HTTPS — tester depuis un téléphone du réseau local
+### HTTPS sur le réseau local (dev et prod)
 Le partage natif d'un fichier (bouton « Partager ») exige HTTPS hors `localhost`.
+`scripts/https-cert.sh` crée une fois une autorité locale (`~/.local/share/cooking-app-ca`, hors dépôt), commune à la dev et à la prod,
+puis un certificat serveur (397 jours) pour `localhost` + les IP du PC (ou les IP/noms passés en argument, ex. `cooking.local`).
+Installer une seule fois `cooking-ca.crt` (copié à côté du certificat) sur chaque téléphone ; le script explique comment.
 ```bash
-scripts/dev-https-cert.sh               # Autorité locale (créée une fois, ~/.local/share/cooking-app-dev-ca) + certificat pour les IP du PC
-cd frontend/cooking-vue-app && npm run dev:https   # Vite en HTTPS sur le port 5174, ouvert au réseau (backend : ./start.sh)
+scripts/https-cert.sh                   # Dev : certificat dans frontend/cooking-vue-app/.certs
+cd frontend/cooking-vue-app && npm run dev:https   # Vite en HTTPS, port 5174, ouvert au réseau (backend : ./start.sh)
+scripts/https-cert.sh --prod            # Prod : certificat dans certs/ (CERTS_DIR), puis ./deploy.sh ; à relancer avant expiration
 ```
-Installer une seule fois `frontend/cooking-vue-app/.certs/cooking-dev-ca.crt` sur le téléphone (le script explique comment), puis ouvrir `https://<IP du PC>:5174`.
 
 ### Production — réseau local (lancement manuel uniquement, jamais automatique)
 ```bash
-cp .env.example .env   # Une seule fois, puis adapter (mot de passe MongoDB, port)
+cp .env.example .env   # Une seule fois, puis adapter (mot de passe MongoDB, ports)
+scripts/https-cert.sh --prod   # Une seule fois (puis avant expiration du certificat, ~1 an)
 ./deploy.sh            # Déploie la branche main locale
 ./deploy.sh v1.0       # Déploie un tag, une branche ou un commit
 docker compose -p cooking-prod logs -f   # Logs de la prod
 docker compose -p cooking-prod down      # Arrêt (données conservées)
 ```
 `deploy.sh` extrait le commit choisi (`git archive`) : les modifications non commitées ne sont jamais déployées.
+Il refuse de déployer sans certificat HTTPS et transmet son dossier (absolu) à Compose via `CERTS_DIR`.
 
 ### Sauvegardes de la production
 ```bash
@@ -75,10 +81,10 @@ Réglages facultatifs dans `.env` : `BACKUP_DIR`, `BACKUP_KEEP`. Sauvegarde quot
 ```bash
 bash scripts/tests/common.test.sh       # Fonctions Docker partagées
 bash scripts/tests/deploy.test.sh       # deploy.sh (faux docker, rapide)
-bash scripts/tests/prod-stack.test.sh   # Stack de prod réelle et jetable (port 8099, ~2-3 min)
-bash scripts/tests/backup.test.sh       # backup.sh + restore.sh sur une stack jetable (port 8099)
+bash scripts/tests/prod-stack.test.sh   # Stack de prod réelle et jetable, en HTTPS (ports 8099/8449, ~2-3 min)
+bash scripts/tests/backup.test.sh       # backup.sh + restore.sh sur une stack jetable (ports 8099/8449)
 bash scripts/tests/devstack.test.sh     # start.sh / stop.sh réels (~2 min, ports 3000/5173 libres)
-bash scripts/tests/dev-https-cert.test.sh   # Certificat HTTPS de dev (rapide, openssl)
+bash scripts/tests/https-cert.test.sh   # Certificats HTTPS dev/prod (rapide, openssl)
 ```
 
 ### Database

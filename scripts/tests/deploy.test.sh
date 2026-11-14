@@ -27,6 +27,7 @@ git commit -qam v2
 cat > "$FAKE/docker" <<'EOS'
 #!/bin/bash
 echo "docker $*" >> "$LOG"
+echo "env CERTS_DIR=$CERTS_DIR" >> "$LOG"
 if [ "$1" = "compose" ] && [[ " $* " == *" up "* ]]; then
   prev=""; for a in "$@"; do [ "$prev" = "-f" ] && echo "deployed: $(cat "$a")" >> "$LOG"; prev="$a"; done
   [ -n "$FAIL_UP" ] && exit 1
@@ -42,6 +43,27 @@ assert "échoue sans .env" test $rc -ne 0
 assert "explique comment créer le .env" grep -q "cp .env.example .env" <<<"$out"
 assert "ne lance rien sans .env" bash -c "! grep -q ' up ' '$LOG'"
 
+printf 'HTTP_PORT=80\nMONGO_USER=u\nMONGO_PASSWORD=p\n' > .env
+
+echo "certificats HTTPS"
+out="$(deploy)"; rc=$?
+assert "échoue sans certificat" test $rc -ne 0
+assert "explique comment créer le certificat" grep -q "scripts/https-cert.sh --prod" <<<"$out"
+assert "ne lance rien sans certificat" bash -c "! grep -q ' up ' '$LOG'"
+mkdir -p certs && touch certs/server.crt certs/server.key
+out="$(deploy)"; rc=$?
+assert "réussit avec les certificats de certs/" test $rc -eq 0
+assert "passe le dossier des certificats à Compose (chemin absolu)" grep -q "env CERTS_DIR=$REPO/certs" "$LOG"
+assert "affiche une adresse https" grep -q "https://" <<<"$out"
+assert "pas de port dans l'adresse quand HTTPS_PORT vaut 443 (défaut)" bash -c "! grep -qE 'https://[^ ]+:[0-9]+' <<<\"\$1\"" _ "$out"
+printf 'HTTPS_PORT=8443\n' >> .env
+out="$(deploy)"
+assert "adresse avec le port quand HTTPS_PORT n'est pas 443" grep -qE "https://[^ ]+:8443" <<<"$out"
+mkdir -p "$REPO/../autres-certs-$$" && touch "$REPO/../autres-certs-$$/server.crt" "$REPO/../autres-certs-$$/server.key"
+printf 'CERTS_DIR=%s\n' "$REPO/../autres-certs-$$" >> .env
+deploy >/dev/null
+assert "CERTS_DIR du .env est respecté" grep -q "env CERTS_DIR=$REPO/../autres-certs-$$" "$LOG"
+rm -rf "$REPO/../autres-certs-$$"
 printf 'HTTP_PORT=80\nMONGO_USER=u\nMONGO_PASSWORD=p\n' > .env
 
 echo "choix de la version"

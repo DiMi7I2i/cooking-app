@@ -17,6 +17,16 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
+# Certificats HTTPS (servis par nginx) : certs/ par défaut, ou CERTS_DIR du .env
+CERTS_DIR="$(env_value CERTS_DIR)"
+CERTS_DIR="${CERTS_DIR:-certs}"
+[[ "$CERTS_DIR" = /* ]] || CERTS_DIR="$ROOT/$CERTS_DIR"
+if [ ! -f "$CERTS_DIR/server.crt" ] || [ ! -f "$CERTS_DIR/server.key" ]; then
+  echo "❌ Certificat HTTPS manquant dans $CERTS_DIR. Créez-le avec :  scripts/https-cert.sh --prod" >&2
+  exit 1
+fi
+export CERTS_DIR
+
 if ! SHA="$(git rev-parse --verify --quiet "$REF^{commit}")"; then
   echo "❌ Version inconnue : '$REF' (ni branche, ni tag, ni commit)." >&2
   exit 1
@@ -44,9 +54,13 @@ if ! prod up -d --build --wait --wait-timeout 180; then
   exit 1
 fi
 
-PORT="$(sed -n 's/^HTTP_PORT=//p' .env)"
-PORT="${PORT:-80}"
+PORT="$(env_value HTTPS_PORT)"
+PORT="${PORT:-443}"
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
-SUFFIX=""; [ "$PORT" != "80" ] && SUFFIX=":$PORT"
+SUFFIX=""; [ "$PORT" != "443" ] && SUFFIX=":$PORT"
 echo "✅ $REF ($SHORT) déployé."
-echo "   Accès depuis le réseau local : http://${IP:-<ip-du-pc>}$SUFFIX"
+echo "   Accès depuis le réseau local : https://${IP:-<ip-du-pc>}$SUFFIX"
+EXPIRY="$(openssl x509 -in "$CERTS_DIR/server.crt" -noout -enddate 2>/dev/null | cut -d= -f2)"
+if [ -n "$EXPIRY" ]; then
+  echo "   Certificat HTTPS valable jusqu'au $EXPIRY (renouveler : scripts/https-cert.sh --prod)"
+fi

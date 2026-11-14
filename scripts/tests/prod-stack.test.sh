@@ -10,10 +10,16 @@ check_docker || exit 1
 detect_compose || exit 1
 
 PORT=8099
-BASE="http://127.0.0.1:$PORT"
+HTTPS_PORT=8449
+BASE="https://127.0.0.1:$HTTPS_PORT"
 WORK="$(mktemp -d)"
+# Autorité et certificat jetables
+CA_DIR="$WORK/ca" OUT_DIR="$WORK/certs" bash scripts/https-cert.sh --prod 127.0.0.1 >/dev/null || exit 1
+CA="$WORK/ca/rootCA.crt"
+export CERTS_DIR="$WORK/certs"
 cat > "$WORK/.env" <<EOF
 HTTP_PORT=$PORT
+HTTPS_PORT=$HTTPS_PORT
 MONGO_USER=cooking
 MONGO_PASSWORD=test-password
 EOF
@@ -26,6 +32,9 @@ assert() { # assert <description> <commande...>
   local desc="$1"; shift
   if "$@"; then echo "  ✔ $desc"; else echo "  ✘ $desc"; FAILS=$((FAILS+1)); fi
 }
+# Toutes les requêtes HTTPS font confiance à l'autorité jetable (et à elle seule)
+curl() { command curl --cacert "$CA" "$@"; }
+export CA; export -f curl
 http_code() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 content_type() { curl -s -o /dev/null -w '%{content_type}' "$@"; }
 
@@ -35,6 +44,13 @@ assert "la stack se construit et démarre" stack up -d --build --wait --wait-tim
 echo "frontend"
 assert "GET / renvoie l'appli" bash -c "curl -sf '$BASE/' | grep -q '<div id=\"app\">'"
 assert "une route Vue (/recipes/xyz) renvoie l'appli" bash -c "curl -sf '$BASE/recipes/xyz' | grep -q '<div id=\"app\">'"
+
+echo "HTTPS"
+assert "le certificat est validé par l'autorité locale" curl -sf -o /dev/null "$BASE/"
+assert "refusé sans l'autorité (pas de certificat de complaisance)" bash -c "! command curl -sf -o /dev/null '$BASE/'"
+assert "HTTP redirige vers HTTPS (301)" test "$(http_code "http://127.0.0.1:$PORT/recipes/xyz")" = "301"
+assert "la redirection garde le chemin et le port HTTPS" \
+  test "$(curl -s -o /dev/null -w '%{redirect_url}' "http://127.0.0.1:$PORT/recipes/xyz")" = "https://127.0.0.1:$HTTPS_PORT/recipes/xyz"
 
 echo "API et images via nginx"
 assert "GET /data/recipes renvoie du JSON" bash -c "[[ \$(curl -s -o /dev/null -w '%{content_type}' '$BASE/data/recipes') == application/json* ]]"
@@ -49,7 +65,7 @@ assert "l'image est servie" test "$(content_type "$BASE$thumb")" = "image/png"
 echo "isolation"
 published="$(docker ps --filter label=com.docker.compose.project=cooking-prod-test \
   --format '{{.Label "com.docker.compose.service"}} {{.Ports}}' | grep -- '->')"
-assert "seul le frontend (nginx) publie un port" test "$(cut -d' ' -f1 <<<"$published")" = "frontend"
+assert "seul le frontend (nginx) publie des ports" test "$(cut -d' ' -f1 <<<"$published")" = "frontend"
 
 echo "persistance"
 stack down >/dev/null 2>&1

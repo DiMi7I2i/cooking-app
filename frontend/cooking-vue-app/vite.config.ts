@@ -6,15 +6,15 @@ import vue from '@vitejs/plugin-vue'
 
 // HTTPS de dev, ouvert au réseau local, pour tester depuis un téléphone
 // (le partage natif de fichiers exige HTTPS hors localhost).
-// Activé seulement par `npm run dev:https` ; certificat créé par scripts/dev-https-cert.sh
+// Activé seulement par `npm run dev:https` ; certificat créé par scripts/https-cert.sh
 function devHttps() {
   if (!process.env.DEV_HTTPS) return undefined
   const dir = fileURLToPath(new URL('./.certs', import.meta.url))
-  const key = `${dir}/dev.key`
-  const cert = `${dir}/dev.crt`
+  const key = `${dir}/server.key`
+  const cert = `${dir}/server.crt`
   if (!existsSync(key) || !existsSync(cert)) {
     throw new Error(
-      `Certificat HTTPS de dev introuvable dans ${dir}. Lancer d'abord : scripts/dev-https-cert.sh`
+      `Certificat HTTPS de dev introuvable dans ${dir}. Lancer d'abord : scripts/https-cert.sh`
     )
   }
   return { key: readFileSync(key), cert: readFileSync(cert) }
